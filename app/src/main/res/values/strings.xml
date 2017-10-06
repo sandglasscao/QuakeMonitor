@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">添乘观测</string>
+    <string name="on_off">开始/结束</string>
+    <string name="platform">站内/外</string>
+    <string name="menu_search">查找</string>
+    <string name="menu_analysis">二次分析</string>
+    <string name="menu_settings">设置</string>
+    <string name="menu_about_us">关于</string>
+    <string name="home_page">首页</string>
+    <string name="platform_thrshld">站区强度阀值</string>
+    <string name="track_thrshld">站外强度阀值</string>
+    <string name="level_1">一级：</string>
+    <string name="level_2">二级：</string>
+    <string name="same_as_track">同站外</string>
+    <string name="history_apl">强度</string>
+    <string name="history_apl_x">强度x</string>
+    <string name="history_apl_z">强度z</string>
+    <string name="history_time">时间</string>
+    <string name="history_lon">经度</string>
+    <string name="history_lat">纬度</string>
+    <string name="history_loc">定位</string>
+</resources>
