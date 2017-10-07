@@ -8,6 +8,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
 
 import java.util.List;
 
@@ -37,6 +41,8 @@ public class QuakeListener implements SensorEventListener {
     private SQLiteDatabase mDatabase;
     private MyDatabaseHelper mDatabaseHelper;
 
+    private LocationClient mLocationClient;
+
     private double[] lastP = {0, 0, 0, 0};
     private long lastTime;
     //private long lastTimeP0, lastTimeP1, lastTimeP2, lastTime;
@@ -44,11 +50,13 @@ public class QuakeListener implements SensorEventListener {
     //DecimalFormat df = new DecimalFormat("#.00");
 
     public QuakeListener(Context context, List<Record> records, List<Record> overTopRecords,
-                         int intervalTime, float[] threshold, MyDatabaseHelper mMysql) {
+                         int intervalTime, float[] threshold, MyDatabaseHelper mMysql,
+                         LocationClient locationClient) {
         mContext = context;
         mRecords = records;
         mOverTopRecords = overTopRecords;
         mDatabaseHelper = mMysql;
+        mLocationClient = locationClient;
         //QuakeListener.setInterval_time(intervalTime);
         mInterval_time = intervalTime;
         recordsSize_max = 2 * 1000 / mInterval_time;
@@ -105,10 +113,12 @@ public class QuakeListener implements SensorEventListener {
             mSensorManager.registerListener(this, mSensor,
                     SensorManager.SENSOR_DELAY_GAME, SensorManager.SENSOR_DELAY_UI);
         }
+        mLocationClient.start();
     }
 
     // stop monitor the sensor accelerometer
     public void stop() {
+        mLocationClient.stop();
         mSensorManager.unregisterListener(this);
     }
 
@@ -132,12 +142,21 @@ public class QuakeListener implements SensorEventListener {
             double ay = lastP[1] - y;
             double az = lastP[2] - z;
             //double a = Math.sqrt(ax * ax + ay * ay + az * az);
-            double a = Math.sqrt(ax * ax + az * az);
-            Record record = new Record(ax, ay, az, a, curTime, 0, 0);
+            double dist = Math.sqrt(ax * ax + az * az);
+            Record record = new Record(ax, ay, az, dist, curTime, 0, 0);
             updateRecords(record);
 
-            if (a >= mthreshold[1])
-                saveRecords(record);
+            if (dist >= mthreshold[1]) {
+                try {
+                    //mLocationClient.requestLocation();
+                    BDLocation location = mLocationClient.getLastKnownLocation();
+                    record.setLongitude(location.getLongitude());
+                    record.setLatitude(location.getLatitude());
+                    saveRecords(record);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
             lastP[0] = x;
             lastP[1] = y;

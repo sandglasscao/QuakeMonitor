@@ -19,4 +19,5 @@
     <string name="history_lon">经度</string>
     <string name="history_lat">纬度</string>
     <string name="history_loc">定位</string>
+    <string name="clear_history">记录已清空</string>
 </resources>

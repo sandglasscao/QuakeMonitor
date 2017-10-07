@@ -9,14 +9,16 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class MyDatabaseHelper extends SQLiteOpenHelper {
-    public static final String CREATE_QUAKE = "create table quake ("
-            + "x real, "
-            + "y real, "
-            + "z real, "
-            + "distance real, "
-            + "time integer, "
-            + "longitude real, "
-            + "latitude real)";
+    private static final String CREATE_QUAKE = "CREATE TABLE quake ("
+            + "x REAL, "
+            + "y REAL, "
+            + "z REAL, "
+            + "distance REAL, "
+            + "time INTEGER, "
+            + "longitude DOUBLE, "
+            + "latitude DOUBLE)";
+
+    private static final String DROP_QUAKE = "DROP TABLE quake";
 
     public MyDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -30,5 +32,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
+    }
+
+    public void truncate(SQLiteDatabase sqLiteDatabase) {
+        sqLiteDatabase.execSQL(DROP_QUAKE);
+        sqLiteDatabase.execSQL(CREATE_QUAKE);
     }
 }
