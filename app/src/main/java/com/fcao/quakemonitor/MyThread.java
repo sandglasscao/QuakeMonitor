@@ -9,11 +9,11 @@ import android.view.SurfaceHolder;
 
 public class MyThread extends Thread {
     private static final int SLEEP_SPAN = 205; // draw again after listener refreshing record list.
-    private QuakeView mView;
+    private QuakeSurfaceView mView;
     private SurfaceHolder holder;
     public boolean isRun = true;
 
-    public MyThread(QuakeView myView) {
+    public MyThread(QuakeSurfaceView myView) {
         this.mView = myView;
         this.holder = mView.getHolder();
     }

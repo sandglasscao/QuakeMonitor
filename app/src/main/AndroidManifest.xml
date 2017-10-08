@@ -71,6 +71,12 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <activity android:name=".FullScreenActivity">
+            <intent-filter>
+                <action android:name="com.fcao.quakemonitor.FULL_SCREEN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

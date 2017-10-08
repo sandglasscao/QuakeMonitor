@@ -52,10 +52,11 @@ public class QuakeActivity extends Activity {
     private MyDatabaseHelper mDBHelper;
     //private SQLiteDatabase mDataBase;
     private boolean isRunning, isOnTrack;
-    private QuakeView mQuakeView;
+    private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
     private QuakeListener mListener;
     private Switch mStart, mOntrack;
     //private MyLocationListener mLocationListener;
+    private RelativeLayout mRelativeLayout_tot, mRelativeLayout_x, mRelativeLayout_z;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -155,11 +156,13 @@ public class QuakeActivity extends Activity {
         thresholdlevel1 = isOnTrack ? threshold[2] : threshold[0];
         thresholdlevel2 = isOnTrack ? threshold[3] : threshold[1];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
-        mQuakeView = new QuakeView(this, intervalTime, threshold);
+
         mListener = new QuakeListener(this, mRecords, mOverTopRecords, intervalTime,
                 threshold, mDBHelper, mLocClient);
-        RelativeLayout rootView = findViewById(R.id.show_graph);
-        rootView.addView(mQuakeView);
+        initSurfaceView();
+
+        //LinearLayout rootView = findViewById(R.id.show_graph);
+        //rootView.addView(mQuakeView);
 
         mStart = findViewById(R.id.monitor_switch);
         mStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -187,7 +190,6 @@ public class QuakeActivity extends Activity {
             }
         });
         isOnTrack = mOntrack.isChecked();
-
     }
 
     private void resetThreshold() {
@@ -195,7 +197,9 @@ public class QuakeActivity extends Activity {
         thresholdlevel1 = isOnTrack ? threshold[2] : threshold[0];
         thresholdlevel2 = isOnTrack ? threshold[3] : threshold[1];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
-        mQuakeView.setThreshold(threshold);
+        mQuakeView_tot.setThreshold(threshold);
+        mQuakeView_x.setThreshold(threshold);
+        mQuakeView_z.setThreshold(threshold);
         mListener.setThreshold(threshold);
     }
 
@@ -263,6 +267,18 @@ public class QuakeActivity extends Activity {
         });
         builder.setNegativeButton("取消", null);
         builder.show();
+    }
+
+    private void initSurfaceView() {
+        mQuakeView_tot = new QuakeSurfaceView(this, intervalTime, threshold, 0);
+        mQuakeView_x = new QuakeSurfaceView(this, intervalTime, threshold, 1);
+        mQuakeView_z = new QuakeSurfaceView(this, intervalTime, threshold, 2);
+        mRelativeLayout_tot = findViewById(R.id.show_graph_tot);
+        mRelativeLayout_x = findViewById(R.id.show_graph_x);
+        mRelativeLayout_z = findViewById(R.id.show_graph_z);
+        mRelativeLayout_tot.addView(mQuakeView_tot);
+        mRelativeLayout_x.addView(mQuakeView_x);
+        mRelativeLayout_z.addView(mQuakeView_z);
     }
 
     private void initDatabaseHelper() {

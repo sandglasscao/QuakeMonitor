@@ -2,8 +2,8 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -13,9 +13,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:logo="@mipmap/ic_launcher"
         android:background="@color/color_0176da"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        app:logo="@mipmap/ic_launcher"
         toolbar:popupTheme="@style/Theme.ToolBar.ZhiHu">
 
     </android.support.v7.widget.Toolbar>
@@ -29,25 +29,25 @@
 
 
         <TextView
+            android:id="@+id/monitor_lbl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="32dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
             android:text="@string/on_off"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/monitor_lbl"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="8dp"
             app:layout_constraintVertical_bias="0.506"/>
 
         <Switch
             android:id="@+id/monitor_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="0dp"
+            android:layout_marginStart="8dp"
             android:checked="true"
             android:textOff="OFF"
             android:textOn="ON"
@@ -60,22 +60,20 @@
             android:id="@+id/platform_lbl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:text="@string/platform"
-            app:layout_constraintTop_toTopOf="@+id/monitor_lbl"
-            android:layout_marginTop="0dp"
             app:layout_constraintBottom_toBottomOf="@+id/monitor_lbl"
-            android:layout_marginBottom="0dp"
-            app:layout_constraintVertical_bias="0.0"
             app:layout_constraintRight_toLeftOf="@+id/platform_switch"
-            android:layout_marginRight="8dp"/>
+            app:layout_constraintTop_toTopOf="@+id/monitor_lbl"
+            app:layout_constraintVertical_bias="0.0"/>
 
         <Switch
             android:id="@+id/platform_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
+            android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
-            android:layout_marginTop="0dp"
             android:checked="true"
             android:textOff="OFF"
             android:textOn="ON"
@@ -84,24 +82,53 @@
             app:layout_constraintTop_toTopOf="@+id/platform_lbl"
             tools:checked="true"/>
 
+
     </android.support.constraint.ConstraintLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/show_graph"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:layout_weight="5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.666"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        >
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
 
-    </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/show_graph_tot"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"/>
+
+        <RelativeLayout
+            android:id="@+id/show_graph_x"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"/>
+
+
+        <RelativeLayout
+            android:id="@+id/show_graph_z"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>

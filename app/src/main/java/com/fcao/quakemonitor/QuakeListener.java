@@ -224,4 +224,10 @@ public class QuakeListener implements SensorEventListener {
             //mDatabaseHelper.close();
         }
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        flush();
+        super.finalize();
+    }
 }
