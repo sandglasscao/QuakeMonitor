@@ -193,8 +193,8 @@ public class QuakeView extends SurfaceView implements SurfaceHolder.Callback {
         RectF rectZ = new RectF();
 
         maxTot = mRecords.get(0).getDistance();
-        maxX = Math.abs(mRecords.get(0).getX());
-        maxZ = Math.abs(mRecords.get(0).getZ());
+        maxX = mRecords.get(0).getX();
+        maxZ = mRecords.get(0).getZ();
         //currentDistTot = coordinate_y - maxTot * scale_y;
         //currentDistX = coordinate_y * 2 - maxX * scale_y;
         //currentDistZ = coordinate_y * 3 - maxZ * scale_y;
@@ -204,8 +204,8 @@ public class QuakeView extends SurfaceView implements SurfaceHolder.Callback {
         for (int valueIndex = 0; valueIndex < lineSize; valueIndex++) {
             currentPos = MARGIN + valueIndex * scale_x;
             double intensityTot = mRecords.get(valueIndex).getDistance();
-            double intensityX = Math.abs(mRecords.get(valueIndex).getX());
-            double intensityZ = Math.abs(mRecords.get(valueIndex).getZ());
+            double intensityX = mRecords.get(valueIndex).getX();
+            double intensityZ = mRecords.get(valueIndex).getZ();
 
             currentDistTot = (float) (coordinate_y - intensityTot * scale_y);
             currentDistX = (float) (coordinate_y * 2 - intensityX * scale_y);

@@ -143,7 +143,7 @@ public class QuakeListener implements SensorEventListener {
             double az = lastP[2] - z;
             //double a = Math.sqrt(ax * ax + ay * ay + az * az);
             double dist = Math.sqrt(ax * ax + az * az);
-            Record record = new Record(ax, ay, az, dist, curTime, 0, 0, 0);
+            Record record = new Record(Math.abs(ax), Math.abs(ay), Math.abs(az), dist, curTime, 0, 0, 0);
             updateRecords(record);
 
             if (dist >= mthreshold[1]) {

@@ -17,7 +17,6 @@ import java.util.List;
  */
 
 public class QuakeAdapter extends BaseAdapter {
-    private Context mContext;
     private LayoutInflater mInflater;
     //private int layout;
     private List<Record> mRecords;
@@ -26,7 +25,6 @@ public class QuakeAdapter extends BaseAdapter {
     SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
     public QuakeAdapter(Context context, List<Record> records) {
-        mContext = context;
         mInflater = LayoutInflater.from(context);
         mRecords = records;
     }
@@ -65,6 +63,7 @@ public class QuakeAdapter extends BaseAdapter {
             viewHolder.record_time = view.findViewById(R.id.record_time);
             viewHolder.longitude = view.findViewById(R.id.longitude);
             viewHolder.latitude = view.findViewById(R.id.latitude);
+            viewHolder.speed = view.findViewById(R.id.speed);
             view.setTag(viewHolder);
         } else {
             view = convertView;
@@ -77,11 +76,12 @@ public class QuakeAdapter extends BaseAdapter {
         viewHolder.record_time.setText(dateformat.format(record.getTime()));
         viewHolder.longitude.setText(df6.format(record.getLongitude()));
         viewHolder.latitude.setText(df6.format(record.getLatitude()));
+        viewHolder.speed.setText(String.valueOf(record.getSpeed()));
         return view;
     }
 
     class ViewHolder {
-        TextView apl_tot, apl_x, apl_z, record_time, longitude, latitude;
+        TextView apl_tot, apl_x, apl_z, record_time, longitude, latitude, speed;
         ImageView show_map;
     }
 }

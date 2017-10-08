@@ -12,12 +12,13 @@
     <string name="level_1">一级：</string>
     <string name="level_2">二级：</string>
     <string name="same_as_track">同站外</string>
-    <string name="history_apl">强度</string>
-    <string name="history_apl_x">强度x</string>
-    <string name="history_apl_z">强度z</string>
-    <string name="history_time">时间</string>
+    <string name="history_apl">综合强度</string>
+    <string name="history_apl_x">左右强度</string>
+    <string name="history_apl_z">颠簸强度</string>
+    <string name="history_time">发生时间</string>
     <string name="history_lon">经度</string>
     <string name="history_lat">纬度</string>
+    <string name="history_speed">速度km/h</string>
     <string name="history_loc">定位</string>
     <string name="clear_history">记录已清空</string>
 </resources>

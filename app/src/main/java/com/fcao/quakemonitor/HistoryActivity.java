@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -41,6 +42,8 @@ public class HistoryActivity extends ListActivity implements AdapterView.OnItemC
         setListAdapter(adapter);*/
         mListView = getListView();
         mListView.setOnItemClickListener(this);
+        View headerView = LayoutInflater.from(this).inflate(R.layout.list_view_header, mListView, false);
+        mListView.addHeaderView(headerView);
         QuakeAdapter adapter = new QuakeAdapter(this, recordList);
         mListView.setAdapter(adapter);
     }
@@ -51,7 +54,6 @@ public class HistoryActivity extends ListActivity implements AdapterView.OnItemC
         Cursor cursor = mDataBase.query("quake",null,null,null,null,null,null);//查询并获得游标
         if(cursor.moveToFirst()) {//判断游标是否为空
             while(cursor.moveToNext()) {
-                //       c.move(i);//移动到指定记录,数据过多会有问题
                 double x = cursor.getDouble(cursor.getColumnIndex("x"));
                 double y = cursor.getDouble(cursor.getColumnIndex("y"));
                 double z = cursor.getDouble(cursor.getColumnIndex("z"));
@@ -59,7 +61,7 @@ public class HistoryActivity extends ListActivity implements AdapterView.OnItemC
                 long time = cursor.getLong(cursor.getColumnIndex("time"));
                 double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
                 double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                double speed = cursor.getDouble(cursor.getColumnIndex("speed"));
+                float speed = cursor.getFloat(cursor.getColumnIndex("speed"));
                 Record record = new Record(x, y, z, distance, time, longitude, latitude, speed);
                 recordList.add(record);
             }

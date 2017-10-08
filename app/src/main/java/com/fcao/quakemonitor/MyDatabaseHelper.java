@@ -17,7 +17,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             + "time INTEGER, "
             + "longitude DOUBLE, "
             + "latitude DOUBLE, "
-            + "speed DOUBLE)";
+            + "speed REAL)";
 
     private static final String DROP_QUAKE = "DROP TABLE quake";
 

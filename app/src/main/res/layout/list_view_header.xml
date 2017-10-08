@@ -12,68 +12,74 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/apl_tot"
+            android:id="@+id/apl_tot_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="2"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/history_apl"/>
 
         <TextView
-            android:id="@+id/apl_x"
+            android:id="@+id/apl_x_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="2"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/history_apl_x"/>
 
         <TextView
-            android:id="@+id/apl_z"
+            android:id="@+id/apl_z_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="2"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/history_apl_z"/>
 
         <TextView
-            android:id="@+id/record_time"
+            android:id="@+id/record_time_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="4"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/history_time"/>
 
         <TextView
-            android:id="@+id/longitude"
+            android:id="@+id/longitude_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="3"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/history_lon"/>
 
         <TextView
-            android:id="@+id/latitude"
+            android:id="@+id/latitude_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="3"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/history_lat"/>
 
         <TextView
-            android:id="@+id/speed"
+            android:id="@+id/latitude_speed"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="2"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/history_speed"/>
 
         <ImageView
-            android:id="@+id/show_map"
+            android:id="@+id/show_map_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:src="@mipmap/ic_place_color"/>
+            android:layout_weight="1"/>
     </LinearLayout>
 
 </LinearLayout>
