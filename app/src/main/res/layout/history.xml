@@ -6,90 +6,10 @@
               android:orientation="vertical"
     >
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/show_history"
+    <ListView
+        android:id="@id/android:list"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
-
-        <TextView
-            android:id="@+id/apl_tot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="32dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-        <TextView
-            android:id="@+id/apl_x"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/apl_tot"
-            app:layout_constraintLeft_toRightOf="@+id/apl_tot"
-            app:layout_constraintTop_toTopOf="@+id/apl_tot"/>
-
-        <TextView
-            android:id="@+id/apl_z"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/apl_x"
-            app:layout_constraintLeft_toRightOf="@+id/apl_x"
-            app:layout_constraintTop_toTopOf="@+id/apl_x"/>
-
-        <TextView
-            android:id="@+id/record_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/apl_z"
-            app:layout_constraintLeft_toRightOf="@+id/apl_z"
-            app:layout_constraintTop_toTopOf="@+id/apl_z"/>
-
-        <TextView
-            android:id="@+id/longitude"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/record_time"
-            app:layout_constraintLeft_toRightOf="@+id/record_time"
-            app:layout_constraintTop_toTopOf="@+id/record_time"/>
-
-        <TextView
-            android:id="@+id/latitude"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/longitude"
-            app:layout_constraintLeft_toRightOf="@+id/longitude"
-            app:layout_constraintTop_toTopOf="@+id/longitude"/>
-
-        <ImageView
-            android:id="@+id/show_map"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="0dp"
-            android:src="@mipmap/ic_place_color"
-            app:layout_constraintBottom_toBottomOf="@+id/latitude"
-            app:layout_constraintLeft_toRightOf="@+id/latitude"
-            app:layout_constraintTop_toTopOf="@+id/latitude"/>
-
-    </android.support.constraint.ConstraintLayout>
+        android:layout_height="match_parent"
+        android:fastScrollEnabled="true" />
 
 </LinearLayout>

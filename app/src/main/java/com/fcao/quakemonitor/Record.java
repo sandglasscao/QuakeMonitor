@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Record implements Serializable{
     private double x, y, z, distance;
     private long mTime;
-    private double mLongitude, mLatitude;
+    private double mLongitude, mLatitude, mSpeed;
 
     public double getLongitude() {
         return mLongitude;
@@ -30,7 +30,7 @@ public class Record implements Serializable{
         mLatitude = latitude;
     }
 
-    public Record(double x, double y, double z, double distance, long time, double longitude, double latitude) {
+    public Record(double x, double y, double z, double distance, long time, double longitude, double latitude, double speed) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -38,6 +38,15 @@ public class Record implements Serializable{
         mTime = time;
         mLongitude = longitude;
         mLatitude = latitude;
+        mSpeed = speed;
+    }
+
+    public double getSpeed() {
+        return mSpeed;
+    }
+
+    public void setSpeed(double speed) {
+        mSpeed = speed;
     }
 
     public double getX() {

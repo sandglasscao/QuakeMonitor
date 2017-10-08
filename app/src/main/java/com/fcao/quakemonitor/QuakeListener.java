@@ -143,19 +143,11 @@ public class QuakeListener implements SensorEventListener {
             double az = lastP[2] - z;
             //double a = Math.sqrt(ax * ax + ay * ay + az * az);
             double dist = Math.sqrt(ax * ax + az * az);
-            Record record = new Record(ax, ay, az, dist, curTime, 0, 0);
+            Record record = new Record(ax, ay, az, dist, curTime, 0, 0, 0);
             updateRecords(record);
 
             if (dist >= mthreshold[1]) {
-                try {
-                    //mLocationClient.requestLocation();
-                    BDLocation location = mLocationClient.getLastKnownLocation();
-                    record.setLongitude(location.getLongitude());
-                    record.setLatitude(location.getLatitude());
-                    saveRecords(record);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                saveRecords(record);
             }
 
             lastP[0] = x;
@@ -186,13 +178,21 @@ public class QuakeListener implements SensorEventListener {
     private void saveRecords(Record record) {
         if (maxLength <= mOverTopRecords.size())
             flush();
-        saveLongLat(record);
+        saveLocation(record);
         mOverTopRecords.add(record);
     }
 
     // get current longitude and latitude
-    private void saveLongLat(Record record) {
-
+    private void saveLocation(Record record) {
+        try {
+            //mLocationClient.requestLocation();
+            BDLocation location = mLocationClient.getLastKnownLocation();
+            record.setLongitude(location.getLongitude());
+            record.setLatitude(location.getLatitude());
+            record.setSpeed(location.getSpeed());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void flush() {
@@ -209,6 +209,7 @@ public class QuakeListener implements SensorEventListener {
                 values.put("time", record.getTime());
                 values.put("longitude", record.getLongitude());
                 values.put("latitude", record.getLatitude());
+                values.put("speed", record.getSpeed());
                 mDatabase.insert("quake", null, values);
                 values.clear();
             }

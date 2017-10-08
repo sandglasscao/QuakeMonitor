@@ -18,15 +18,16 @@ import java.util.List;
 
 public class QuakeAdapter extends BaseAdapter {
     private Context mContext;
-    private int layout;
+    private LayoutInflater mInflater;
+    //private int layout;
     private List<Record> mRecords;
     DecimalFormat df2 = new DecimalFormat("#.00");
     DecimalFormat df6 = new DecimalFormat("#.000000");
     SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
-    public QuakeAdapter(Context context, int layout, List<Record> records) {
+    public QuakeAdapter(Context context, List<Record> records) {
         mContext = context;
-        this.layout = layout;
+        mInflater = LayoutInflater.from(context);
         mRecords = records;
     }
 
@@ -52,9 +53,10 @@ public class QuakeAdapter extends BaseAdapter {
 
         ViewHolder viewHolder;
         if (null == view) {
-            LayoutInflater inflater = (LayoutInflater) this.mContext
+            /*LayoutInflater inflater = (LayoutInflater) this.mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(this.layout, parent, false);
+            view = inflater.inflate(this.layout, parent, false);*/
+            view = mInflater.inflate(R.layout.list_item, null);
             viewHolder = new ViewHolder();
             viewHolder.show_map = view.findViewById(R.id.show_map);
             viewHolder.apl_tot = view.findViewById(R.id.apl_tot);

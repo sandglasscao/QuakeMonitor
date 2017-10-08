@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 
 public class HistoryActivity extends ListActivity implements AdapterView.OnItemClickListener {
+    private ListView mListView;
     private MyDatabaseHelper mDBHelper;
     private List<Record> recordList = new ArrayList<Record>();
 
@@ -25,16 +27,22 @@ public class HistoryActivity extends ListActivity implements AdapterView.OnItemC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setContentView(R.layout.history);
+
         Intent intent = getIntent();
         //recordList = (List<Record>) intent.getSerializableExtra("records");
         String dbName = intent.getStringExtra("dbname");
         mDBHelper = new MyDatabaseHelper(this, dbName, null, 1);
 
         initRecords();
-        QuakeAdapter adapter = new QuakeAdapter(this,
+        /*QuakeAdapter adapter = new QuakeAdapter(this,
                 R.layout.history,
                 recordList);
-        setListAdapter(adapter);
+        setListAdapter(adapter);*/
+        mListView = getListView();
+        mListView.setOnItemClickListener(this);
+        QuakeAdapter adapter = new QuakeAdapter(this, recordList);
+        mListView.setAdapter(adapter);
     }
 
     private void initRecords() {
@@ -51,7 +59,8 @@ public class HistoryActivity extends ListActivity implements AdapterView.OnItemC
                 long time = cursor.getLong(cursor.getColumnIndex("time"));
                 double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
                 double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                Record record = new Record(x, y, z, distance, time, longitude, latitude);
+                double speed = cursor.getDouble(cursor.getColumnIndex("speed"));
+                Record record = new Record(x, y, z, distance, time, longitude, latitude, speed);
                 recordList.add(record);
             }
         }
@@ -67,9 +76,10 @@ public class HistoryActivity extends ListActivity implements AdapterView.OnItemC
             return;
         }
         Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
-        view.getId();
-        getSelectedItemPosition();
-        parent.getSelectedItem();
+        Record record = (Record) parent.getItemAtPosition(position);
+        //intent.putExtra("longitude", record.getLongitude());
+        //intent.putExtra("latitude", record.getLatitude());
+        intent.putExtra("records", record);
         startActivity(intent);
     }
 }
