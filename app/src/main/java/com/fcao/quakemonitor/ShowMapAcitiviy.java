@@ -19,7 +19,8 @@ import com.baidu.mapapi.model.LatLng;
  */
 
 public class ShowMapAcitiviy extends Activity {
-    private static final double[] DEFAULT_LOCATION = {116.327779, 39.900769};
+    private static final double[] DEFAULT_LOCATION = {116.327779, 39.900769}; //北京
+    private static final float DEFAULT_SCALE = 12.5f; //default scale of map
     private MapView mMapView;
     private BaiduMap mBaiduMap;
 
@@ -42,8 +43,8 @@ public class ShowMapAcitiviy extends Activity {
         mBaiduMap = mMapView.getMap();// 地图初始化
         mBaiduMap.setMyLocationEnabled(true);// 开启定位图层
         setLocation(record.getLongitude(), record.getLatitude());
-        String locInfo = "经度：" + record.getLongitude()  + "    纬度：" + record.getLatitude()
-                + "    速度：" + record.getSpeed();
+        String locInfo = "经度：" + record.getLongitude()  + "   纬度：" + record.getLatitude()
+                + "   速度：" + record.getSpeed() + " km/h";
         mTextView.setText(locInfo);
     }
 
@@ -57,7 +58,7 @@ public class ShowMapAcitiviy extends Activity {
             isFirstLoc = false;
             LatLng ll = new LatLng(latitude,longitude);
             MapStatus.Builder builder = new MapStatus.Builder();
-            builder.target(ll).zoom(12.0f);
+            builder.target(ll).zoom(DEFAULT_SCALE);
             mBaiduMap.animateMapStatus(MapStatusUpdateFactory
                     .newMapStatus(builder.build()));
         }
