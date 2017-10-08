@@ -158,7 +158,7 @@ public class QuakeActivity extends Activity {
         mQuakeView = new QuakeView(this, intervalTime, threshold);
         mListener = new QuakeListener(this, mRecords, mOverTopRecords, intervalTime,
                 threshold, mDBHelper, mLocClient);
-        RelativeLayout rootView = findViewById(R.id.show_layout);
+        RelativeLayout rootView = findViewById(R.id.show_graph);
         rootView.addView(mQuakeView);
 
         mStart = findViewById(R.id.monitor_switch);

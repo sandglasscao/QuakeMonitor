@@ -47,9 +47,9 @@ public class QuakeView extends SurfaceView implements SurfaceHolder.Callback {
         mRecords = activity.mRecords;
         mInterval_time = intervalTime;
         setThreshold(threshold);
-        requestFocus();
+        //requestFocus();
         getHolder().addCallback(this);
-        init();
+        initPaints();
     }
 
     @Override
@@ -91,12 +91,12 @@ public class QuakeView extends SurfaceView implements SurfaceHolder.Callback {
         mthreshold = threshold;
     }
 
-    private void init() {
+    private void initPaints() {
         //mPointList = new ArrayList<Float>();
         mPaint = new Paint();
-        mPaint.setColor(Color.GREEN);
-        mPaint.setStrokeWidth(lnWidth);
-        mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        //mPaint.setColor(Color.GREEN);
+        //mPaint.setStrokeWidth(lnWidth);
+        mPaint.setStyle(Paint.Style.FILL);
         mPaint.setAntiAlias(true);
 
         /*pointPaint = new Paint();

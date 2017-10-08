@@ -49,12 +49,12 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="0dp"
             android:checked="true"
-            android:showText="true"
             android:textOff="OFF"
             android:textOn="ON"
             app:layout_constraintBottom_toBottomOf="@+id/monitor_lbl"
             app:layout_constraintLeft_toRightOf="@+id/monitor_lbl"
-            app:layout_constraintTop_toTopOf="@+id/monitor_lbl"/>
+            app:layout_constraintTop_toTopOf="@+id/monitor_lbl"
+            tools:checked="true"/>
 
         <TextView
             android:id="@+id/platform_lbl"
@@ -77,17 +77,17 @@
             android:layout_marginRight="32dp"
             android:layout_marginTop="0dp"
             android:checked="true"
-            android:showText="true"
-            android:textOff="Of"
-            android:textOn="On"
+            android:textOff="OFF"
+            android:textOn="ON"
             app:layout_constraintBottom_toBottomOf="@+id/platform_lbl"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/platform_lbl"/>
+            app:layout_constraintTop_toTopOf="@+id/platform_lbl"
+            tools:checked="true"/>
 
     </android.support.constraint.ConstraintLayout>
 
     <RelativeLayout
-        android:id="@+id/show_layout"
+        android:id="@+id/show_graph"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
