@@ -20,8 +20,6 @@ import java.util.List;
  */
 
 public class QuakeListener implements SensorEventListener {
-    //private static final int SHAKE_THRESHOLD = 5;
-    //private static final int SHAKE_THRESHOLD_MIN = 2;
     private static final int maxLength = 2; //for overtop records to save into SQLite
     private static int mInterval_time;
     private float[] mthreshold;
@@ -45,9 +43,6 @@ public class QuakeListener implements SensorEventListener {
 
     private double[] lastP = {0, 0, 0, 0};
     private long lastTime;
-    //private long lastTimeP0, lastTimeP1, lastTimeP2, lastTime;
-    //private double dist = 0;
-    //DecimalFormat df = new DecimalFormat("#.00");
 
     public QuakeListener(Context context, List<Record> records, List<Record> overTopRecords,
                          int intervalTime, float[] threshold, MyDatabaseHelper mMysql,
@@ -57,7 +52,6 @@ public class QuakeListener implements SensorEventListener {
         mOverTopRecords = overTopRecords;
         mDatabaseHelper = mMysql;
         mLocationClient = locationClient;
-        //QuakeListener.setInterval_time(intervalTime);
         mInterval_time = intervalTime;
         recordsSize_max = 2 * 1000 / mInterval_time;
         setThreshold(threshold);
@@ -93,12 +87,6 @@ public class QuakeListener implements SensorEventListener {
         mthreshold = threshold;
         mRecords.clear();
     }
-    /*public static void setInterval_time(int interval_time) {
-        QuakeListener.interval_time = interval_time;
-        QuakeListener.recordsSize_max = 10 * 1000 / QuakeListener.interval_time;
-        //10s has the 1000/intervalTime records
-        mRecords.clear();
-    }*/
 
     // start monitor the sensor accelerometer
     public void start() {

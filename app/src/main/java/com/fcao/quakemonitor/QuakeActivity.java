@@ -32,10 +32,13 @@ import com.baidu.mapapi.SDKInitializer;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class QuakeActivity extends Activity implements View.OnClickListener {
+    private static final Map GRAPH_POSITION = new HashMap();
     private static String DB_NAME = "Quake.db";
     public static final int REQUEST_PERMISSION_CODE = 1;
     private static String[] PERMISSIONS = {
@@ -48,6 +51,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     //1: threshold level 2 of in station, default 10
     //2: threshold level 1 of on track, default 5
     //3: threshold level 2 of on track, default 10
+
     private boolean isAllGranted = false;
     public List<Record> mRecords = new ArrayList<>();
     public List<Record> mOverTopRecords = new ArrayList<>();
@@ -55,7 +59,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public LocationClient mLocClient;
 
     public MyDatabaseHelper mDBHelper;
-    private boolean isRunning, isOnTrack;
+    private boolean isRunning, isOnPlatform;
     private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
     private QuakeListener mListener;
     private Switch mStart, mOntrack;
@@ -63,7 +67,6 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 1003: {
                 mThreshold = (resultCode == RESULT_OK) ? data.getFloatArrayExtra("threshold") : mThreshold;
@@ -104,9 +107,6 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
         toolbar.setTitle(R.string.app_name);
         toolbar.setBackgroundColor(0xFF1E90FF);
-        //toolbar.setNavigationIcon();
-        toolbar.setNavigationIcon(R.drawable.ic_back);
-
         toolbar.inflateMenu(R.menu.toolbar);//top-right menu
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -173,14 +173,15 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         initLocationClient();
         intervalTime = 20; //default interval time 20ms
         float thresholdlevel1, thresholdlevel2;
-        thresholdlevel1 = isOnTrack ? mThreshold[2] : mThreshold[0];
-        thresholdlevel2 = isOnTrack ? mThreshold[3] : mThreshold[1];
+        thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
+        thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
 
         mListener = new QuakeListener(this, mRecords, mOverTopRecords, intervalTime,
                 threshold, mDBHelper, mLocClient);
         initSurfaceView();
 
+        initGRAPH_POSITION();
         mStart = findViewById(R.id.monitor_switch);
         mStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -202,17 +203,17 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
                     mListener.stop();
                     mListener.start();
                 }
-                isOnTrack = isChecked;
+                isOnPlatform = isChecked;
                 resetThreshold();
             }
         });
-        isOnTrack = mOntrack.isChecked();
+        isOnPlatform = mOntrack.isChecked();
     }
 
     private void resetThreshold() {
         float thresholdlevel1, thresholdlevel2;
-        thresholdlevel1 = isOnTrack ? mThreshold[2] : mThreshold[0];
-        thresholdlevel2 = isOnTrack ? mThreshold[3] : mThreshold[1];
+        thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
+        thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
         mQuakeView_tot.setThreshold(threshold);
         mQuakeView_x.setThreshold(threshold);
@@ -383,42 +384,21 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        int pos = 0;
-        switch (v.getId()) {
-            case R.id.show_graph_tot: {
-                pos = 0;
-                break;
-            }
-            case R.id.show_graph_x: {
-                pos = 1;
-                break;
-            }
-            case R.id.show_graph_z: {
-                pos = 2;
-                break;
-            }
-            default:
-        }
-        /*Intent intent = new Intent("com.fcao.quakemonitor.FULL_SCREEN");
-        intent.putExtra("pos", pos);
-        intent.putExtra("threshold", mThreshold);
-        intent.putExtra("intervalTime", intervalTime);
-        intent.putExtra("records", (Serializable) mRecords);
-        startActivity(intent);
-*/
+        int pos = (int) GRAPH_POSITION.get(v.getId());
         FullScreenFragment fragment = new FullScreenFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("pos", pos);
-        /*
-        bundle.putSerializable("threshold", mThreshold);
-        bundle.putDouble("intervalTime", intervalTime);
-        bundle.putSerializable("records", (Serializable) mRecords);
-        */
         fragment.setArguments(bundle);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main_fragment, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    private void initGRAPH_POSITION() {
+        GRAPH_POSITION.put(R.id.show_graph_tot, 0);
+        GRAPH_POSITION.put(R.id.show_graph_x, 1);
+        GRAPH_POSITION.put(R.id.show_graph_z, 2);
     }
 }

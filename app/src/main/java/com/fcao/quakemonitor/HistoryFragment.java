@@ -1,8 +1,6 @@
 package com.fcao.quakemonitor;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;

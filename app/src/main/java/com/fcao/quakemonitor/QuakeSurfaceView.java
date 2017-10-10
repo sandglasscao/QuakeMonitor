@@ -4,14 +4,11 @@ import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PathMeasure;
 import android.graphics.RectF;
 import android.text.TextPaint;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 /**
