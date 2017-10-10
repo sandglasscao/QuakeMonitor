@@ -3,10 +3,13 @@ package com.fcao.quakemonitor;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,7 +18,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
@@ -30,12 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class QuakeActivity extends Activity {
-    public static float[] threshold = {5, 10, 5, 10};
-    //0: threshold level 1 of in station, default 5
-    //1: threshold level 2 of in station, default 10
-    //2: threshold level 1 of on track, default 5
-    //3: threshold level 2 of on track, default 10
+public class QuakeActivity extends Activity implements View.OnClickListener {
     private static String DB_NAME = "Quake.db";
     public static final int REQUEST_PERMISSION_CODE = 1;
     private static String[] PERMISSIONS = {
@@ -43,19 +43,22 @@ public class QuakeActivity extends Activity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
+    public float[] mThreshold = {5, 10, 5, 10};
+    //0: threshold level 1 of in station, default 5
+    //1: threshold level 2 of in station, default 10
+    //2: threshold level 1 of on track, default 5
+    //3: threshold level 2 of on track, default 10
     private boolean isAllGranted = false;
     public List<Record> mRecords = new ArrayList<>();
     public List<Record> mOverTopRecords = new ArrayList<>();
     public int intervalTime; // default interval time for listener
     public LocationClient mLocClient;
 
-    private MyDatabaseHelper mDBHelper;
-    //private SQLiteDatabase mDataBase;
+    public MyDatabaseHelper mDBHelper;
     private boolean isRunning, isOnTrack;
     private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
     private QuakeListener mListener;
     private Switch mStart, mOntrack;
-    //private MyLocationListener mLocationListener;
     private RelativeLayout mRelativeLayout_tot, mRelativeLayout_x, mRelativeLayout_z;
 
     @Override
@@ -63,11 +66,27 @@ public class QuakeActivity extends Activity {
         //super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 1003: {
-                threshold = (resultCode == RESULT_OK) ? data.getFloatArrayExtra("threshold") : threshold;
+                mThreshold = (resultCode == RESULT_OK) ? data.getFloatArrayExtra("threshold") : mThreshold;
                 resetThreshold();
                 break;
             }
             default:
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 如果是橫屏時候
+        try {
+            // Checks the orientation of the screen
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                Log.d("HistoryFragment", "screen landscape");
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Log.d("HistoryFragment", "Back to portrait");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -77,37 +96,38 @@ public class QuakeActivity extends Activity {
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         SDKInitializer.initialize(getApplicationContext());
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         //toolbar2.setNavigationIcon(R.mipmap.ic_launcher);//the navigation icon, now it's app log
         //toolbar2.setLogo(R.mipmap.ic_launcher);//app logo
 
         toolbar.setTitle(R.string.app_name);
+        toolbar.setBackgroundColor(0xFF1E90FF);
+        //toolbar.setNavigationIcon();
+        toolbar.setNavigationIcon(R.drawable.ic_back);
+
         toolbar.inflateMenu(R.menu.toolbar);//top-right menu
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.action_search:
-                        break;
                     case R.id.action_analysis: {
-                        Intent intent = new Intent("com.fcao.quakemonitor.SHOW_QUAKES");
-                        intent.putExtra("dbname", getMyDatabaseName());
-                        startActivityForResult(intent, 1002); //1002 for show history
+                        HistoryFragment fragment = new HistoryFragment();
+                        FragmentManager fragmentManager = getFragmentManager();
+                        FragmentTransaction transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.main_fragment, fragment);
+                        transaction.addToBackStack(null);
+                        transaction.commit();
                         break;
                     }
                     case R.id.action_settings: {
-                        /*SettingsFragment fragment = new SettingsFragment();
+                        SettingsFragment fragment = new SettingsFragment();
                         FragmentManager fragmentManager = getFragmentManager();
                         FragmentTransaction transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.main_fragment, fragment);
                         transaction.addToBackStack(null);
-                        transaction.commit();*/
-                        //Intent intent = new Intent(QuakeActivity.this, SettingsActivity.class);
-                        Intent intent = new Intent("com.fcao.quakemonitor.SET_APL");
-                        intent.putExtra("threshold", threshold);
-                        intent.putExtra("dbname", getMyDatabaseName());
-                        startActivityForResult(intent, 1003); //1003 for settings
+                        transaction.commit();
                         break;
                     }
                     case R.id.action_about:
@@ -153,16 +173,13 @@ public class QuakeActivity extends Activity {
         initLocationClient();
         intervalTime = 20; //default interval time 20ms
         float thresholdlevel1, thresholdlevel2;
-        thresholdlevel1 = isOnTrack ? threshold[2] : threshold[0];
-        thresholdlevel2 = isOnTrack ? threshold[3] : threshold[1];
+        thresholdlevel1 = isOnTrack ? mThreshold[2] : mThreshold[0];
+        thresholdlevel2 = isOnTrack ? mThreshold[3] : mThreshold[1];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
 
         mListener = new QuakeListener(this, mRecords, mOverTopRecords, intervalTime,
                 threshold, mDBHelper, mLocClient);
         initSurfaceView();
-
-        //LinearLayout rootView = findViewById(R.id.show_graph);
-        //rootView.addView(mQuakeView);
 
         mStart = findViewById(R.id.monitor_switch);
         mStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -194,8 +211,8 @@ public class QuakeActivity extends Activity {
 
     private void resetThreshold() {
         float thresholdlevel1, thresholdlevel2;
-        thresholdlevel1 = isOnTrack ? threshold[2] : threshold[0];
-        thresholdlevel2 = isOnTrack ? threshold[3] : threshold[1];
+        thresholdlevel1 = isOnTrack ? mThreshold[2] : mThreshold[0];
+        thresholdlevel2 = isOnTrack ? mThreshold[3] : mThreshold[1];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
         mQuakeView_tot.setThreshold(threshold);
         mQuakeView_x.setThreshold(threshold);
@@ -270,15 +287,18 @@ public class QuakeActivity extends Activity {
     }
 
     private void initSurfaceView() {
-        mQuakeView_tot = new QuakeSurfaceView(this, intervalTime, threshold, 0);
-        mQuakeView_x = new QuakeSurfaceView(this, intervalTime, threshold, 1);
-        mQuakeView_z = new QuakeSurfaceView(this, intervalTime, threshold, 2);
+        mQuakeView_tot = new QuakeSurfaceView(this, intervalTime, mThreshold, mRecords, 0);
+        mQuakeView_x = new QuakeSurfaceView(this, intervalTime, mThreshold, mRecords, 1);
+        mQuakeView_z = new QuakeSurfaceView(this, intervalTime, mThreshold, mRecords, 2);
         mRelativeLayout_tot = findViewById(R.id.show_graph_tot);
         mRelativeLayout_x = findViewById(R.id.show_graph_x);
         mRelativeLayout_z = findViewById(R.id.show_graph_z);
         mRelativeLayout_tot.addView(mQuakeView_tot);
         mRelativeLayout_x.addView(mQuakeView_x);
         mRelativeLayout_z.addView(mQuakeView_z);
+        mRelativeLayout_tot.setOnClickListener(this);
+        mRelativeLayout_x.setOnClickListener(this);
+        mRelativeLayout_z.setOnClickListener(this);
     }
 
     private void initDatabaseHelper() {
@@ -315,7 +335,6 @@ public class QuakeActivity extends Activity {
     // 定位初始化
     private void initLocationClient() {
         mLocClient = new LocationClient(this);
-        //mLocationListener  = new MyLocationListener();
         initLocationOption();
     }
 
@@ -331,7 +350,7 @@ public class QuakeActivity extends Activity {
         //可选，默认false,设置是否使用gps
         option.setServiceName("com.baidu.location.service_v4.5");
 
-        int span=1000;
+        int span = 1000;
         option.setScanSpan(span);
         //可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
 /*
@@ -360,5 +379,46 @@ public class QuakeActivity extends Activity {
         //可选，7.2版本新增能力，如果您设置了这个接口，首次启动定位时，会先判断当前WiFi是否超出有效期，超出有效期的话，会先重新扫描WiFi，然后再定位
 */
         mLocClient.setLocOption(option);
+    }
+
+    @Override
+    public void onClick(View v) {
+        int pos = 0;
+        switch (v.getId()) {
+            case R.id.show_graph_tot: {
+                pos = 0;
+                break;
+            }
+            case R.id.show_graph_x: {
+                pos = 1;
+                break;
+            }
+            case R.id.show_graph_z: {
+                pos = 2;
+                break;
+            }
+            default:
+        }
+        /*Intent intent = new Intent("com.fcao.quakemonitor.FULL_SCREEN");
+        intent.putExtra("pos", pos);
+        intent.putExtra("threshold", mThreshold);
+        intent.putExtra("intervalTime", intervalTime);
+        intent.putExtra("records", (Serializable) mRecords);
+        startActivity(intent);
+*/
+        FullScreenFragment fragment = new FullScreenFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("pos", pos);
+        /*
+        bundle.putSerializable("threshold", mThreshold);
+        bundle.putDouble("intervalTime", intervalTime);
+        bundle.putSerializable("records", (Serializable) mRecords);
+        */
+        fragment.setArguments(bundle);
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.main_fragment, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

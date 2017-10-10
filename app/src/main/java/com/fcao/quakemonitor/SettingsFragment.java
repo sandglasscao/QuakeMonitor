@@ -1,42 +1,50 @@
 package com.fcao.quakemonitor;
 
-import android.app.Activity;
-import android.content.Intent;
+import android.app.Fragment;
+import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 /**
- * Created by Frank on 10/1/2017.
+ * Created by Frank on 10/9/2017.
  */
 
-public class SettingsActivity extends Activity implements View.OnClickListener{
+public class SettingsFragment extends Fragment implements View.OnClickListener{
     private float[] threshold = {0,0,0,0};
     private EditText platform_level1, platform_level2, track_level1,track_level2;
     private Button ok_btn, cancel_btn, del_history;
     private MyDatabaseHelper mDBHelper;
+    private QuakeActivity mParent;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        String dbName = intent.getStringExtra("dbname");
-        mDBHelper = new MyDatabaseHelper(this, dbName, null, 1);
-        threshold = intent.getFloatArrayExtra("threshold");
-        setContentView(R.layout.settings);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        mParent = (QuakeActivity) getActivity();
+        mDBHelper = mParent.mDBHelper;
+        threshold = mParent.mThreshold;
 
-        platform_level1 = findViewById(R.id.platform_level1);
-        platform_level2 = findViewById(R.id.platform_level2);
-        track_level1 = findViewById(R.id.track_level1);
-        track_level2 = findViewById(R.id.track_level2);
-        ok_btn = findViewById(R.id.ok_btn);
-        cancel_btn = findViewById(R.id.cancel_btn);
-        del_history = findViewById(R.id.del_history);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        View view = inflater.inflate(R.layout.settings, container, false);
+
+        platform_level1 = view.findViewById(R.id.platform_level1);
+        platform_level2 = view.findViewById(R.id.platform_level2);
+        track_level1 = view.findViewById(R.id.track_level1);
+        track_level2 = view.findViewById(R.id.track_level2);
+        ok_btn = view.findViewById(R.id.ok_btn);
+        cancel_btn = view.findViewById(R.id.cancel_btn);
+        del_history = view.findViewById(R.id.del_history);
         ok_btn.setOnClickListener(this);
         cancel_btn.setOnClickListener(this);
         del_history.setOnClickListener(this);
@@ -44,6 +52,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
         platform_level2.setText(Float.toString(threshold[1]));
         track_level1.setText(Float.toString(threshold[2]));
         track_level2.setText(Float.toString(threshold[3]));
+        return view;
     }
 
     @Override
@@ -54,17 +63,12 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
                 threshold[1] = Float.parseFloat(platform_level2.getText().toString());
                 threshold[2] = Float.parseFloat(track_level1.getText().toString());
                 threshold[3] = Float.parseFloat(track_level2.getText().toString());
-                Intent intent = new Intent();
-                intent.putExtra("threshold", threshold);
-                setResult(RESULT_OK, intent);
-                finish();
+                getActivity().onBackPressed();
                 break;
             }
             case R.id.cancel_btn: {
-                Intent intent = new Intent();
-                intent.putExtra("threshold", threshold);
-                setResult(RESULT_CANCELED, intent);
-                finish();
+                getActivity().onBackPressed();
+                break;
             }
             case R.id.del_history: {
                 del_history();
@@ -79,7 +83,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener{
         SQLiteDatabase mDataBase = mDBHelper.getReadableDatabase();
         try {
             mDBHelper.truncate(mDataBase);
-            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

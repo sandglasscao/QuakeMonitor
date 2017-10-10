@@ -1,5 +1,6 @@
 package com.fcao.quakemonitor;
 
+import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -33,14 +34,12 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     private List<Record> mRecords;
 
     private MyThread myThread;
-    private Paint mPaint;
-    private TextPaint textPaint;
-    private TextPaint scalePaint;
-    private Paint axesPaint;
+    private Paint mPaint, axesPaint, dashPaint;
+    private TextPaint textPaint, scalePaint;
 
-    public QuakeSurfaceView(QuakeActivity activity, int intervalTime, float[] threshold, int seq) {
+    public QuakeSurfaceView(Activity activity, int intervalTime, float[] threshold, List<Record> records, int seq) {
         super(activity);
-        mRecords = activity.mRecords;
+        mRecords = records;
         mInterval_time = intervalTime;
         mSeq = seq;
         setThreshold(threshold);
@@ -60,21 +59,14 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        scrWidth = this.getWidth();
-        scrHeight = this.getHeight();
-        coordinate_x = scrWidth;
-        coordinate_y = scrHeight;
-        scale_x = coordinate_x / 2 * mInterval_time / 1000;
-        scale_y = coordinate_y / 100;
-        scale_y = scale_y * 5; // scale the y axis
-        lnWidth = scale_x / 2;
 
         myThread = new MyThread(this);
         myThread.start();
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+        initCoordinate(width, height);
         mRecords.clear();
     }
 
@@ -85,6 +77,17 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     public void setThreshold(float[] threshold) {
         mthreshold = threshold;
+    }
+
+    private void initCoordinate(int width, int height) {
+        scrWidth = width;
+        scrHeight = height;
+        coordinate_x = scrWidth;
+        coordinate_y = scrHeight - MARGIN;
+        scale_x = coordinate_x / 2 * mInterval_time / 1000;
+        scale_y = coordinate_y / 100;
+        scale_y = scale_y * 5; // scale the y axis
+        lnWidth = scale_x / 2;
     }
 
     private void initPaints() {
@@ -100,12 +103,19 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
         axesPaint = new Paint();
         axesPaint.setColor(0xff082e54);//Color.argb(1, 25, 25, 112));
+        axesPaint.setStyle(Paint.Style.STROKE);
         axesPaint.setStrokeWidth(5);
+
+        dashPaint = new Paint();
+        dashPaint.setColor(0xffb0e0e6);//Color.argb(1, 25, 25, 112));
+        dashPaint.setStyle(Paint.Style.STROKE);
+        dashPaint.setStrokeWidth(5);
 
         scalePaint = new TextPaint();
         scalePaint.setColor(Color.DKGRAY);
         scalePaint.setStyle(Paint.Style.FILL);
         scalePaint.setTextSize(30);
+        scalePaint.setTextAlign(Paint.Align.CENTER);
     }
 
     private void drawWave(Canvas canvas) {
@@ -113,16 +123,7 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     }
 
     private void drawAxes(Canvas canvas) {
-        scalePaint.setTextAlign(Paint.Align.CENTER);
-
         float yPos = coordinate_y;
-        canvas.drawLine(MARGIN, yPos, scrWidth, yPos, axesPaint); // x axis
-        canvas.drawLine(MARGIN, yPos, MARGIN, yPos - coordinate_y + MARGIN, axesPaint); // y axis
-
-        String content = "(s)";
-        canvas.drawText(content, coordinate_x - content.length(), yPos + MARGIN, scalePaint);
-        String title = String.format(titleApl[mSeq], maxApl);
-        canvas.drawText(title, scrWidth / 3, yPos - coordinate_y + MARGIN * 3, textPaint);
 
         scalePaint.setTextAlign(Paint.Align.LEFT);
         for (int i = 1; i < 4; i++) {
@@ -137,16 +138,22 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         for (int i = 1; i <= 3; i++) {
             float yPosMark = yPos - i * scale_y * 5 + axesPaint.getStrokeWidth() / 2;
             canvas.drawText(String.valueOf(i * 5), 0, yPosMark, scalePaint);
-            canvas.drawLine(MARGIN, yPosMark, MARGIN + 10, yPosMark, axesPaint);
+            canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
         }
+
+        canvas.drawLine(MARGIN, yPos, scrWidth, yPos, axesPaint); // x axis
+        canvas.drawLine(MARGIN, yPos, MARGIN, MARGIN, axesPaint); // y axis
+
+        String content = "(s)";
+        canvas.drawText(content, coordinate_x - MARGIN, yPos + MARGIN, scalePaint);
+        String title = String.format(titleApl[mSeq], maxApl);
+        canvas.drawText(title, scrWidth / 3, MARGIN, textPaint);
     }
 
     // draw histogram with the records
     private void drawHistogram(Canvas canvas) {
         float currentPos;
         double currentDist;
-        // calculate the y axis because the coordinate origin is placed on the left-bottom corner
-        //double maxTot, maxX, maxZ;
         RectF rect = new RectF();
 
         maxApl = getApl(0);
