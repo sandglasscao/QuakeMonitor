@@ -25,7 +25,8 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
     private QuakeActivity mParent;
     private ListView mListView;
     private MyDatabaseHelper mDBHelper;
-    private List<Record> recordList = new ArrayList<Record>();    ;
+    private List<Record> recordList = new ArrayList<Record>();
+    ;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -72,19 +73,17 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
         SQLiteDatabase mDataBase = mDBHelper.getReadableDatabase();
 
         Cursor cursor = mDataBase.query("quake", null, null, null, null, null, null);//查询并获得游标
-        if (cursor.moveToFirst()) {//判断游标是否为空
-            while (cursor.moveToNext()) {
-                double x = cursor.getDouble(cursor.getColumnIndex("x"));
-                double y = cursor.getDouble(cursor.getColumnIndex("y"));
-                double z = cursor.getDouble(cursor.getColumnIndex("z"));
-                double distance = cursor.getDouble(cursor.getColumnIndex("distance"));
-                long time = cursor.getLong(cursor.getColumnIndex("time"));
-                double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-                double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                float speed = cursor.getFloat(cursor.getColumnIndex("speed"));
-                Record record = new Record(x, y, z, distance, time, longitude, latitude, speed);
-                recordList.add(record);
-            }
+        while (cursor.moveToNext()) {
+            double x = cursor.getDouble(cursor.getColumnIndex("x"));
+            double y = cursor.getDouble(cursor.getColumnIndex("y"));
+            double z = cursor.getDouble(cursor.getColumnIndex("z"));
+            double distance = cursor.getDouble(cursor.getColumnIndex("distance"));
+            long time = cursor.getLong(cursor.getColumnIndex("time"));
+            double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+            double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
+            float speed = cursor.getFloat(cursor.getColumnIndex("speed"));
+            Record record = new Record(x, y, z, distance, time, longitude, latitude, speed);
+            recordList.add(record);
         }
 
         cursor.close();

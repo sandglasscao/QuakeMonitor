@@ -46,7 +46,7 @@ public class QuakeAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Record record = (Record) this.getItem(position);
+        Record record = (Record) this.getItem(position); //because of the list header
         View view = convertView;
 
         ViewHolder viewHolder;
