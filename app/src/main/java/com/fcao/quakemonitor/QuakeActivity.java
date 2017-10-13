@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.storage.StorageManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -25,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
@@ -46,7 +48,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
-    public float[] mThreshold = {5, 10, 5, 10};
+    public float[] mThreshold = {15, 20, 10, 15};
     //0: threshold level 1 of in station, default 5
     //1: threshold level 2 of in station, default 10
     //2: threshold level 1 of on track, default 5
@@ -64,6 +66,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     private QuakeListener mListener;
     private Switch mStart, mOntrack;
     private RelativeLayout mRelativeLayout_tot, mRelativeLayout_x, mRelativeLayout_z;
+    private static String mExternalStoragePath;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -80,7 +83,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // 如果是橫屏時候
+        /*// 如果是橫屏時候
         try {
             // Checks the orientation of the screen
             if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -90,7 +93,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
@@ -106,6 +109,8 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         //toolbar2.setLogo(R.mipmap.ic_launcher);//app logo
 
         toolbar.setTitle(R.string.app_name);
+        toolbar.setNavigationIcon(R.drawable.ic_back);
+        toolbar.setNavigationOnClickListener(this);
         toolbar.setBackgroundColor(0xFF1E90FF);
         toolbar.inflateMenu(R.menu.toolbar);//top-right menu
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -165,8 +170,20 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         isAllGranted = checkPermissionAllGranted(PERMISSIONS);
+        ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE);
+        int count = 3;
+        while (!isAllGranted && count > 0) {
+            try {
+                wait(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            isAllGranted = checkPermissionAllGranted(PERMISSIONS);
+            count--;
+        }
         if (!isAllGranted)
-            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_CODE);
+            finish();
+        mExternalStoragePath = getExternalStoragePath();
         initDatabaseHelper();
 
         // 定位初始化
@@ -315,14 +332,14 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     private String getMyDatabaseName() {
         boolean isSdcardEnable = false;
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {//SDCard是否插入
-            isSdcardEnable = true;
-        }
+        isSdcardEnable = Environment.MEDIA_MOUNTED.equals(state); //SDCard是否插入
         String dbPath = null;
-        if (isSdcardEnable && isAllGranted) {
-            dbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + getPackageName();
+        if (isSdcardEnable && isAllGranted) { //here isAllGranted must be true
+            //Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + getPackageName();
+            dbPath = mExternalStoragePath + "/Android/data/" + getPackageName();
         } else {//未插入SDCard，建在内存中
-            dbPath = getFilesDir().getPath();
+            Toast.makeText(this, R.string.no_sdcard, Toast.LENGTH_LONG).show();
+            finish();
         }
         dbPath = dbPath + "/database/";
         File dbp = new File(dbPath);
@@ -384,21 +401,35 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        int pos = (int) GRAPH_POSITION.get(v.getId());
-        FullScreenFragment fragment = new FullScreenFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("pos", pos);
-        fragment.setArguments(bundle);
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.main_fragment, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        switch (v.getId()) { //back to the previous screen
+            case -1: {
+                onBackPressed();
+                break;
+            }
+            default: { // full screen to zoom out one of the three waveforms
+                int pos = (int) GRAPH_POSITION.get(v.getId());
+                FullScreenFragment fragment = new FullScreenFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("pos", pos);
+                fragment.setArguments(bundle);
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.main_fragment, fragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        }
     }
 
     private void initGRAPH_POSITION() {
         GRAPH_POSITION.put(R.id.show_graph_tot, 0);
         GRAPH_POSITION.put(R.id.show_graph_x, 1);
         GRAPH_POSITION.put(R.id.show_graph_z, 2);
+    }
+
+    private String getExternalStoragePath() {
+        StorageList list = new StorageList(this);
+        return (list.getVolumePaths()[1] == null) ? list.getVolumePaths()[0]
+                : list.getVolumePaths()[1];
     }
 }

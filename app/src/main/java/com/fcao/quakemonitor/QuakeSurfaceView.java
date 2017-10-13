@@ -16,18 +16,16 @@ import java.util.List;
  */
 
 public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
-    //private static final int UPDATE_INTERVAL_TIME = 200;
-    //private static final int SCALE = 3; // y coordinate scale
-    //private static final double SMOOTHNESS = 0.16;
     private static final int MARGIN = 50;
-    private static int scrWidth, scrHeight;
-    private static float coordinate_x, coordinate_y, scale_x, scale_y;
+    private final String[] titleApl = {"综合强度：%f", "水平检测：%f", "高低检测：%f"};
+    private int scrWidth, scrHeight;
+    private float coordinate_x, coordinate_y, scale_x, scale_y;
     private int mInterval_time;
-    private static float lnWidth;
+    private float lnWidth;
     private float[] mthreshold;
     private int mSeq;
-    private static double maxApl;
-    private static String[] titleApl = {"综合最大强度：%f", "晃动最大强度：%f", "颠簸最大强度：%f"};
+    private  int mYmarks;
+    private double maxApl;
     private List<Record> mRecords;
 
     private MyThread myThread;
@@ -83,7 +81,8 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         coordinate_y = scrHeight - MARGIN;
         scale_x = coordinate_x / 2 * mInterval_time / 1000;
         scale_y = coordinate_y / 100;
-        scale_y = scale_y * 5; // scale the y axis
+        scale_y = scale_y * 5;//(1 == mSeq) ? scale_y * 5 : scale_y * 3; // scale the y axis
+        mYmarks = 3;//(1 == mSeq) ? 3 : 5;
         lnWidth = scale_x / 2;
     }
 
@@ -123,7 +122,7 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         float yPos = coordinate_y;
 
         scalePaint.setTextAlign(Paint.Align.LEFT);
-        for (int i = 1; i < 4; i++) {
+        for (int i = 1; i < 4; i++) {  //x axis
             float xPosMark = MARGIN + i * coordinate_x / 4;
             double mark = i / 2.0;
             int markR = (int) Math.rint(mark);
@@ -132,7 +131,7 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
             canvas.drawLine(xPosMark, yPos, xPosMark, yPos - 10, axesPaint);
         }
 
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= mYmarks; i++) { // y axis
             float yPosMark = yPos - i * scale_y * 5 + axesPaint.getStrokeWidth() / 2;
             canvas.drawText(String.valueOf(i * 5), 0, yPosMark, scalePaint);
             canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
@@ -155,11 +154,13 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
         maxApl = getApl(0);
         final int lineSize = mRecords.size();
+        double apl;
+        float pos;
         for (int i = 0; i < lineSize; i++) {
             currentPos = MARGIN + i * scale_x;
-            double apl = getApl(i);
+            apl = getApl(i);
             currentDist = (float) (coordinate_y - apl * scale_y);
-            float pos = (0 == i) ? MARGIN : currentPos;
+            pos = (0 == i) ? MARGIN : currentPos;
             rect.set(pos - lnWidth / 2, (float) currentDist, pos + lnWidth / 2, coordinate_y);
 
             drawRect(canvas, apl, rect);

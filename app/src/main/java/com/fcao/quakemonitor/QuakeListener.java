@@ -36,7 +36,6 @@ public class QuakeListener implements SensorEventListener {
 
     private Context mContext;
     private List<Record> mRecords, mOverTopRecords;
-    private SQLiteDatabase mDatabase;
     private MyDatabaseHelper mDatabaseHelper;
 
     private LocationClient mLocationClient;
@@ -117,10 +116,12 @@ public class QuakeListener implements SensorEventListener {
         double rollA = gravity * Math.abs(Math.sin(mOrientationAngles[2]) * Math.cos(mOrientationAngles[1]));
         double pitchA = gravity * Math.abs(Math.sin(mOrientationAngles[1]));
         double amplitudeA = Math.sqrt(gravity * gravity - rollA * rollA - pitchA * pitchA);
-        double x = Math.abs(mAccelerometerReading[0]) - rollA;
-        double y = Math.abs(mAccelerometerReading[1]) - pitchA;
-        double z = Math.abs(mAccelerometerReading[2]) - amplitudeA;
+        double x = mAccelerometerReading[0] - rollA;
+        double y = mAccelerometerReading[1] - pitchA;
+        double z = mAccelerometerReading[2] - amplitudeA;
         //double a = Math.sqrt(x * x + y * y + z * z);
+        x = x * 2;
+        z = z * 2;
 
         if ((curTime - lastTime) > mInterval_time) {
             //long diffTime = curTime - lastTime;
@@ -185,8 +186,8 @@ public class QuakeListener implements SensorEventListener {
 
     private void flush() {
         boolean isLocked = false;
-        mDatabase = mDatabaseHelper.getReadableDatabase();
-        mDatabase.beginTransaction();
+        SQLiteDatabase mDataBase = mDatabaseHelper.getReadableDatabase();
+        mDataBase.beginTransaction();
         try {
             ContentValues values = new ContentValues();
             for (Record record : mOverTopRecords) {
@@ -198,17 +199,17 @@ public class QuakeListener implements SensorEventListener {
                 values.put("longitude", record.getLongitude());
                 values.put("latitude", record.getLatitude());
                 values.put("speed", record.getSpeed());
-                mDatabase.insert("quake", null, values);
+                mDataBase.insert("quake", null, values);
                 values.clear();
             }
             // 设置事务标志为成功，当结束事务时就会提交事务
-            mDatabase.setTransactionSuccessful();
+            mDataBase.setTransactionSuccessful();
             mOverTopRecords.clear();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            mDatabase.endTransaction();// 结束事务
-            mDatabase.close();
+            mDataBase.endTransaction();// 结束事务
+            mDataBase.close();
             //mDatabaseHelper.close();
         }
     }
