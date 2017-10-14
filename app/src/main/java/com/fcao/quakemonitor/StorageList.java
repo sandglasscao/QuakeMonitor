@@ -21,8 +21,7 @@ public class StorageList {
             mStorageManager = (StorageManager) mActivity
                     .getSystemService(Activity.STORAGE_SERVICE);
             try {
-                mMethodGetPaths = mStorageManager.getClass()
-                        .getMethod("getVolumePaths");
+                mMethodGetPaths = mStorageManager.getClass().getMethod("getVolumePaths");
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }

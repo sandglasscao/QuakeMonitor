@@ -337,9 +337,10 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         if (isSdcardEnable && isAllGranted) { //here isAllGranted must be true
             //Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + getPackageName();
             dbPath = mExternalStoragePath + "/Android/data/" + getPackageName();
-        } else {//未插入SDCard，建在内存中
-            Toast.makeText(this, R.string.no_sdcard, Toast.LENGTH_LONG).show();
-            finish();
+        } else {//未插入SDCard，建在内部存储卡中
+            /*Toast.makeText(this, R.string.no_sdcard, Toast.LENGTH_LONG).show();
+            finish();*/
+            dbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + getPackageName();
         }
         dbPath = dbPath + "/database/";
         File dbp = new File(dbPath);
