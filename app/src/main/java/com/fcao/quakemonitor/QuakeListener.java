@@ -57,6 +57,11 @@ public class QuakeListener implements SensorEventListener {
     }
 
     @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+
+    @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER: {
@@ -75,11 +80,6 @@ public class QuakeListener implements SensorEventListener {
         updateOrientationAngles();
         if (aHasInit & mHasInit)
             calculateAmplitude();
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
     }
 
     public void setThreshold(float[] threshold) {
@@ -107,6 +107,12 @@ public class QuakeListener implements SensorEventListener {
     public void stop() {
         mLocationClient.stop();
         mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        flush();
+        super.finalize();
     }
 
     private void calculateAmplitude() {
@@ -145,45 +151,6 @@ public class QuakeListener implements SensorEventListener {
         }
     }
 
-    private void updateOrientationAngles() {
-        // Update rotation matrix, which is needed to update orientation angles.
-        mSensorManager.getRotationMatrix(mRotationMatrix, null,
-                mAccelerometerReading, mMagnetometerReading);
-        // "mRotationMatrix" now has up-to-date information.
-
-        mSensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
-        // "mOrientationAngles" now has up-to-date information.
-    }
-
-    //update sensor records
-    private void updateRecords(Record record) {
-        if (recordsSize_max <= mRecords.size()) {
-            mRecords.remove(0);
-        }
-        mRecords.add(record);
-    }
-
-    //save records
-    private void saveRecords(Record record) {
-        if (maxLength <= mOverTopRecords.size())
-            flush();
-        saveLocation(record);
-        mOverTopRecords.add(record);
-    }
-
-    // get current longitude and latitude
-    private void saveLocation(Record record) {
-        try {
-            //mLocationClient.requestLocation();
-            BDLocation location = mLocationClient.getLastKnownLocation();
-            record.setLongitude(location.getLongitude());
-            record.setLatitude(location.getLatitude());
-            record.setSpeed(location.getSpeed());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void flush() {
         boolean isLocked = false;
         SQLiteDatabase mDataBase = mDatabaseHelper.getReadableDatabase();
@@ -214,9 +181,42 @@ public class QuakeListener implements SensorEventListener {
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        flush();
-        super.finalize();
+    //save records
+    private void saveRecords(Record record) {
+        if (maxLength <= mOverTopRecords.size())
+            flush();
+        saveLocation(record);
+        mOverTopRecords.add(record);
+    }
+
+    // get current longitude and latitude
+    private void saveLocation(Record record) {
+        try {
+            //mLocationClient.requestLocation();
+            BDLocation location = mLocationClient.getLastKnownLocation();
+            record.setLongitude(location.getLongitude());
+            record.setLatitude(location.getLatitude());
+            record.setSpeed(location.getSpeed());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateOrientationAngles() {
+        // Update rotation matrix, which is needed to update orientation angles.
+        mSensorManager.getRotationMatrix(mRotationMatrix, null,
+                mAccelerometerReading, mMagnetometerReading);
+        // "mRotationMatrix" now has up-to-date information.
+
+        mSensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
+        // "mOrientationAngles" now has up-to-date information.
+    }
+
+    //update sensor records
+    private void updateRecords(Record record) {
+        if (recordsSize_max <= mRecords.size()) {
+            mRecords.remove(0);
+        }
+        mRecords.add(record);
     }
 }

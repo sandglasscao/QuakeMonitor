@@ -48,20 +48,10 @@ public class ShowMapAcitiviy extends Activity {
         mTextView.setText(locInfo);
     }
 
-    private void setLocation(double longitude, double latitude) {
-        MyLocationData locData = new MyLocationData.Builder()
-                // 此处设置开发者获取到的方向信息，顺时针0-360
-                .direction(100).latitude(latitude)
-                .longitude(longitude).build();
-        mBaiduMap.setMyLocationData(locData);
-        if (isFirstLoc) {
-            isFirstLoc = false;
-            LatLng ll = new LatLng(latitude,longitude);
-            MapStatus.Builder builder = new MapStatus.Builder();
-            builder.target(ll).zoom(DEFAULT_SCALE);
-            mBaiduMap.animateMapStatus(MapStatusUpdateFactory
-                    .newMapStatus(builder.build()));
-        }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
     }
 
     @Override
@@ -76,9 +66,19 @@ public class ShowMapAcitiviy extends Activity {
         mMapView.onResume();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mMapView.onDestroy();
+    private void setLocation(double longitude, double latitude) {
+        MyLocationData locData = new MyLocationData.Builder()
+                // 此处设置开发者获取到的方向信息，顺时针0-360
+                .direction(100).latitude(latitude)
+                .longitude(longitude).build();
+        mBaiduMap.setMyLocationData(locData);
+        if (isFirstLoc) {
+            isFirstLoc = false;
+            LatLng ll = new LatLng(latitude,longitude);
+            MapStatus.Builder builder = new MapStatus.Builder();
+            builder.target(ll).zoom(DEFAULT_SCALE);
+            mBaiduMap.animateMapStatus(MapStatusUpdateFactory
+                    .newMapStatus(builder.build()));
+        }
     }
 }

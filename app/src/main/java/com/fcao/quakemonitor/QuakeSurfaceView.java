@@ -52,11 +52,8 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         drawAxes(canvas);
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
-        myThread = new MyThread(this);
-        myThread.start();
+    public void setThreshold(float[] threshold) {
+        mthreshold = threshold;
     }
 
     @Override
@@ -66,56 +63,15 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     }
 
     @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+
+        myThread = new MyThread(this);
+        myThread.start();
+    }
+
+    @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         myThread.isRun = false;
-    }
-
-    public void setThreshold(float[] threshold) {
-        mthreshold = threshold;
-    }
-
-    private void initCoordinate(int width, int height) {
-        scrWidth = width;
-        scrHeight = height;
-        coordinate_x = scrWidth;
-        coordinate_y = scrHeight - MARGIN;
-        scale_x = coordinate_x / 2 * mInterval_time / 1000;
-        scale_y = coordinate_y / 100;
-        scale_y = scale_y * 5;//(1 == mSeq) ? scale_y * 5 : scale_y * 3; // scale the y axis
-        mYmarks = 3;//(1 == mSeq) ? 3 : 5;
-        lnWidth = scale_x / 2;
-    }
-
-    private void initPaints() {
-        mPaint = new Paint();
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setAntiAlias(true);
-
-        textPaint = new TextPaint();
-        textPaint.setColor(Color.BLUE);
-        textPaint.setStyle(Paint.Style.FILL);
-        textPaint.setTextSize(50);
-        textPaint.setFakeBoldText(true);
-
-        axesPaint = new Paint();
-        axesPaint.setColor(0xff082e54);//Color.argb(1, 25, 25, 112));
-        axesPaint.setStyle(Paint.Style.STROKE);
-        axesPaint.setStrokeWidth(5);
-
-        dashPaint = new Paint();
-        dashPaint.setColor(0xffb0e0e6);//Color.argb(1, 25, 25, 112));
-        dashPaint.setStyle(Paint.Style.STROKE);
-        dashPaint.setStrokeWidth(5);
-
-        scalePaint = new TextPaint();
-        scalePaint.setColor(Color.DKGRAY);
-        scalePaint.setStyle(Paint.Style.FILL);
-        scalePaint.setTextSize(30);
-        scalePaint.setTextAlign(Paint.Align.CENTER);
-    }
-
-    private void drawWave(Canvas canvas) {
-        drawHistogram(canvas);
     }
 
     private void drawAxes(Canvas canvas) {
@@ -169,6 +125,20 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         }
     }
 
+    private void drawRect(Canvas canvas, double intensity, RectF rectF) {
+        if (intensity >= mthreshold[1])
+            mPaint.setColor(0xffe3170d); //Red
+        else if (intensity >= mthreshold[0])
+            mPaint.setColor(0xffff9912); //Yellow
+        else
+            mPaint.setColor(0xff228b22); //Green
+        canvas.drawRect(rectF, mPaint);
+    }
+
+    private void drawWave(Canvas canvas) {
+        drawHistogram(canvas);
+    }
+
     private double getApl(int pos) {
         double Apl = 0;
         switch (mSeq) {
@@ -189,13 +159,43 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         return Apl;
     }
 
-    private void drawRect(Canvas canvas, double intensity, RectF rectF) {
-        if (intensity >= mthreshold[1])
-            mPaint.setColor(0xffe3170d); //Red
-        else if (intensity >= mthreshold[0])
-            mPaint.setColor(0xffff9912); //Yellow
-        else
-            mPaint.setColor(0xff228b22); //Green
-        canvas.drawRect(rectF, mPaint);
+    private void initCoordinate(int width, int height) {
+        scrWidth = width;
+        scrHeight = height;
+        coordinate_x = scrWidth;
+        coordinate_y = scrHeight - MARGIN;
+        scale_x = coordinate_x / 2 * mInterval_time / 1000;
+        scale_y = coordinate_y / 100;
+        scale_y = scale_y * 5;//(1 == mSeq) ? scale_y * 5 : scale_y * 3; // scale the y axis
+        mYmarks = 3;//(1 == mSeq) ? 3 : 5;
+        lnWidth = scale_x / 2;
+    }
+
+    private void initPaints() {
+        mPaint = new Paint();
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setAntiAlias(true);
+
+        textPaint = new TextPaint();
+        textPaint.setColor(Color.BLUE);
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setTextSize(50);
+        textPaint.setFakeBoldText(true);
+
+        axesPaint = new Paint();
+        axesPaint.setColor(0xff082e54);//Color.argb(1, 25, 25, 112));
+        axesPaint.setStyle(Paint.Style.STROKE);
+        axesPaint.setStrokeWidth(5);
+
+        dashPaint = new Paint();
+        dashPaint.setColor(0xffb0e0e6);//Color.argb(1, 25, 25, 112));
+        dashPaint.setStyle(Paint.Style.STROKE);
+        dashPaint.setStrokeWidth(5);
+
+        scalePaint = new TextPaint();
+        scalePaint.setColor(Color.DKGRAY);
+        scalePaint.setStyle(Paint.Style.FILL);
+        scalePaint.setTextSize(30);
+        scalePaint.setTextAlign(Paint.Align.CENTER);
     }
 }

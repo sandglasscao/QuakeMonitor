@@ -21,4 +21,5 @@
     <string name="history_loc">定位</string>
     <string name="clear_history">记录已清空</string>
     <string name="no_sdcard">无外部存储，系统将退出!</string>
+    <string name="auth_lbl">请输入授权码：</string>
 </resources>

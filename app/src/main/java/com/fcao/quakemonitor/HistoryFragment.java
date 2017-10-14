@@ -26,18 +26,6 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
     private ListView mListView;
     private MyDatabaseHelper mDBHelper;
     private List<Record> recordList = new ArrayList<Record>();
-    ;
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (-1 == id) { // 点击的是headerView或者<strong>footerView</strong>
-            return;
-        }
-        Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
-        Record record = (Record) parent.getItemAtPosition(position);
-        intent.putExtra("records", record);
-        startActivity(intent);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +49,23 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
         mListView.setAdapter(adapter);
 
         return view;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (-1 == id) { // 点击的是headerView或者<strong>footerView</strong>
+            return;
+        }
+        Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
+        Record record = (Record) parent.getItemAtPosition(position);
+        intent.putExtra("records", record);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mDBHelper.close();
     }
 
     @Override
@@ -88,11 +93,5 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
 
         cursor.close();
         mDataBase.close();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mDBHelper.close();
     }
 }
