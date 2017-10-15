@@ -8,6 +8,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -31,7 +33,10 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,22 +52,23 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
-    private static String mExternalStoragePath; // for the second SD card
+    private static String FILE_NAME = "cipher";
+    //private static String mExternalStoragePath; // for the second SD card
+    private static String mCipher;
 
     public float[] mThreshold = {15, 20, 10, 15};
     //0: threshold level 1 of in station, default 5
     //1: threshold level 2 of in station, default 10
     //2: threshold level 1 of on track, default 5
     //3: threshold level 2 of on track, default 10
-
-    private boolean isAllGranted = false;
     public List<Record> mRecords = new ArrayList<>();
     public List<Record> mOverTopRecords = new ArrayList<>();
     public int intervalTime; // default interval time for listener
     public LocationClient mLocClient;
     public MyLocationListener mLocationListener;
-
     public MyDatabaseHelper mDBHelper;
+
+    private boolean isAllGranted = false;
     private boolean isRunning, isOnPlatform;
     private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
     private QuakeListener mListener;
@@ -239,7 +245,12 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         }
         if (!isAllGranted)
             finish();
-        mExternalStoragePath = getExternalStoragePath();
+
+        if (!checkAuth()) {
+            getCipher();
+            checkLicense();
+        }
+
         initDatabaseHelper();
 
         // 定位初始化
@@ -283,9 +294,39 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         isOnPlatform = mOntrack.isChecked();
     }
 
-    /**
-     * 检查是否拥有指定的所有权限
-     */
+    private boolean checkAuth() {
+        SharedPreferences pref = getSharedPreferences("license", MODE_PRIVATE);
+        int hasLicense = pref.getInt("hasLicense", 0);
+        return (1 == hasLicense);
+    }
+
+    private void checkLicense() {
+        final EditText input = new EditText(this);
+        AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
+        inputDialog.setTitle(R.string.license_lbl).setView(input);
+        inputDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (MD5Utils.md5Password(input.getText().toString()).equals(mCipher)) {
+                    SharedPreferences.Editor editor = getSharedPreferences("license", MODE_PRIVATE).edit();
+                    editor.putInt("hasLicense", 1);
+                    editor.commit();
+                } else {
+                    Toast.makeText(getApplicationContext(), "授权码错误，请重新输入！", Toast.LENGTH_SHORT).show();
+                    checkLicense();
+                }
+            }
+        });
+        inputDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        inputDialog.show();
+    }
+
+    // 检查是否拥有指定的所有权限
     private boolean checkPermissionAllGranted(String[] permissions) {
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -296,11 +337,33 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         return true;
     }
 
+    private void getCipher() {
+        File file = new File(getStoragePath(), FILE_NAME);
+        BufferedReader reader = null;
+        try {
+            FileInputStream in = new FileInputStream(file);
+            reader = new BufferedReader(new InputStreamReader(in));
+            mCipher = reader.readLine();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private String getExternalStoragePath() {
         StorageList list = new StorageList(this);
-        return (2 == list.getVolumePaths().length) ? list.getVolumePaths()[1]
-                : list.getVolumePaths()[0];
+        /*return (2 == list.getVolumePaths().length) ? list.getVolumePaths()[1]
+                : list.getVolumePaths()[0];*/
+        return list.getVolumePaths()[list.getVolumePaths().length - 1];
     }
+
     private String getMyDatabaseName() {
         boolean isSdcardEnable = false;
         String state = Environment.getExternalStorageState();
@@ -308,7 +371,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         String dbPath = null;
         if (isSdcardEnable && isAllGranted) { //here isAllGranted must be true
             //dbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + getPackageName();
-            dbPath = mExternalStoragePath + "/Android/data/" + getPackageName();
+            dbPath = getExternalStoragePath() + "/Android/data/" + getPackageName();
         } else {//未插入SDCard，建在内部存储卡中
             finish();
         }
@@ -319,6 +382,23 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
         String databasename = dbPath + DB_NAME;
         return databasename;
+    }
+
+    private String getStoragePath() {
+        boolean isSdcardEnable;
+        String filePath = getExternalStoragePath();
+        String state = Environment.getExternalStorageState();
+        isSdcardEnable = Environment.MEDIA_MOUNTED.equals(state); //SDCard是否插入
+        if (isSdcardEnable && isAllGranted) { //here isAllGranted must be true
+            filePath = filePath + "/Android/data";
+        } else {//未插入SDCard，建在内部存储卡中
+            finish();
+        }
+        File dbp = new File(filePath);
+        if (!dbp.exists())
+            dbp.mkdirs();
+
+        return filePath;
     }
 
     private void initDatabaseHelper() {

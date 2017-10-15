@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">添乘仪</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="clear">清空记录</string>
     <string name="on_off">结束/开始</string>
     <string name="platform">线路/站内</string>
     <string name="menu_search">查找</string>
@@ -21,5 +24,6 @@
     <string name="history_loc">定位</string>
     <string name="clear_history">记录已清空</string>
     <string name="no_sdcard">无外部存储，系统将退出!</string>
-    <string name="auth_lbl">请输入授权码：</string>
+    <string name="license_lbl">请输入授权码</string>
+    <string name="input_again">授权码错误，请重新输入！</string>
 </resources>
