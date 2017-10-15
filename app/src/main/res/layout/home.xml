@@ -30,17 +30,18 @@
 
         <TextView
             android:id="@+id/monitor_lbl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="64dp"
+            android:layout_height="21dp"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="32dp"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="0dp"
             android:text="@string/on_off"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.506"/>
+            app:layout_constraintVertical_bias="0.512"
+            />
 
         <Switch
             android:id="@+id/monitor_switch"
@@ -82,6 +83,15 @@
             app:layout_constraintTop_toTopOf="@+id/platform_lbl"
             tools:checked="true"/>
 
+        <TextView
+            android:id="@+id/loc_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="经纬度"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="4dp"
+            app:layout_constraintTop_toBottomOf="@+id/monitor_switch"/>
 
     </android.support.constraint.ConstraintLayout>
 
@@ -93,6 +103,7 @@
         android:orientation="vertical"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp">
+
 
         <RelativeLayout
             android:id="@+id/show_graph_tot"

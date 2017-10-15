@@ -27,6 +27,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.LocationClient;
@@ -75,13 +76,29 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     private Switch mStart, mOntrack;
     private RelativeLayout mRelativeLayout_tot, mRelativeLayout_x, mRelativeLayout_z;
     private Fragment mCurrentFragment;
+    private TextView mLocMsg;
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mCurrentFragment = null;
+    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) { //back to the previous screen
             case -1: {
                 onBackPressed();
+                break;
+            }
+            case R.id.loc_msg: {
+                String msg = mLocMsg.getText().toString();
+                String[] msgLst = msg.split(" ");
+                Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
+                intent.putExtra("longitude", Double.valueOf(msgLst[1]));
+                intent.putExtra("latitude", Double.valueOf(msgLst[5]));
+                intent.putExtra("speed", Float.valueOf(msgLst[9]));
+                startActivity(intent);
                 break;
             }
             default: { // full screen to zoom out one of the three waveforms
@@ -246,10 +263,11 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         if (!isAllGranted)
             finish();
 
-        if (!checkAuth()) {
+        // temporary no check auth
+       /* if (!checkAuth()) {
             getCipher();
             checkLicense();
-        }
+        }*/
 
         initDatabaseHelper();
 
@@ -261,8 +279,10 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
 
+        mLocMsg = findViewById(R.id.loc_msg);
+        mLocMsg.setOnClickListener(this);
         mListener = new QuakeListener(this, mRecords, mOverTopRecords, intervalTime,
-                threshold, mDBHelper, mLocClient);
+                threshold, mDBHelper, mLocClient, mLocMsg);
         initSurfaceView();
 
         initGRAPH_POSITION();

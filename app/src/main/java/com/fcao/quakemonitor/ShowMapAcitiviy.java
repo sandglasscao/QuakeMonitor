@@ -34,17 +34,18 @@ public class ShowMapAcitiviy extends Activity {
         setContentView(R.layout.map);
 
         Intent intent = getIntent();
-        //double longitude = intent.getDoubleExtra("longitude",DEFAULT_LOCATION[0]);
-        //double latitude = intent.getDoubleExtra("latitude", DEFAULT_LOCATION[1]);
-        Record record = (Record) intent.getSerializableExtra("records");
+        double longitude = intent.getDoubleExtra("longitude",DEFAULT_LOCATION[0]);
+        double latitude = intent.getDoubleExtra("latitude", DEFAULT_LOCATION[1]);
+        double speed = intent.getFloatExtra("speed", 0);
+        //Record record = (Record) intent.getSerializableExtra("records");
 
         mTextView = findViewById(R.id.loc_tv);
         mMapView = findViewById(R.id.bmapView);
         mBaiduMap = mMapView.getMap();// 地图初始化
         mBaiduMap.setMyLocationEnabled(true);// 开启定位图层
-        setLocation(record.getLongitude(), record.getLatitude());
-        String locInfo = "经度：" + record.getLongitude()  + "   纬度：" + record.getLatitude()
-                + "   速度：" + record.getSpeed() + " km/h";
+        setLocation(longitude, latitude);
+        String locInfo = "经度：" + longitude  + "   纬度：" + latitude
+                + "   速度：" + speed + " km/h";
         mTextView.setText(locInfo);
     }
 

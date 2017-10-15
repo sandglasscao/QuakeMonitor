@@ -9,6 +9,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
@@ -37,20 +38,20 @@ public class QuakeListener implements SensorEventListener {
     private Context mContext;
     private List<Record> mRecords, mOverTopRecords;
     private MyDatabaseHelper mDatabaseHelper;
-
     private LocationClient mLocationClient;
-
     private double[] lastP = {0, 0, 0, 0};
     private long lastTime;
+    private TextView mLocmsg;
 
     public QuakeListener(Context context, List<Record> records, List<Record> overTopRecords,
                          int intervalTime, float[] threshold, MyDatabaseHelper mMysql,
-                         LocationClient locationClient) {
+                         LocationClient locationClient, TextView locmsg) {
         mContext = context;
         mRecords = records;
         mOverTopRecords = overTopRecords;
         mDatabaseHelper = mMysql;
         mLocationClient = locationClient;
+        mLocmsg = locmsg;
         mInterval_time = intervalTime;
         recordsSize_max = 2 * 1000 / mInterval_time;
         setThreshold(threshold);
@@ -139,6 +140,7 @@ public class QuakeListener implements SensorEventListener {
             //double a = Math.sqrt(ax * ax + ay * ay + az * az);
             double dist = Math.sqrt(ax * ax + az * az);
             Record record = new Record(Math.abs(ax), Math.abs(ay), Math.abs(az), dist, curTime, 0, 0, 0);
+            saveLocation(record);
             updateRecords(record);
 
             if (dist >= mthreshold[1]) {
@@ -197,9 +199,16 @@ public class QuakeListener implements SensorEventListener {
             record.setLongitude(location.getLongitude());
             record.setLatitude(location.getLatitude());
             record.setSpeed(location.getSpeed());
+            updateLocMsg(location);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateLocMsg(BDLocation location) {
+        String msg = "经度: " + location.getLongitude() + "   纬度: " + location.getLatitude()
+                + "   速度: " + location.getSpeed() + " km/h";
+        mLocmsg.setText(msg);
     }
 
     private void updateOrientationAngles() {

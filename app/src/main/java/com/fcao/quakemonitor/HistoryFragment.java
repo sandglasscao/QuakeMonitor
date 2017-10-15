@@ -58,7 +58,9 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
         }
         Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
         Record record = (Record) parent.getItemAtPosition(position);
-        intent.putExtra("records", record);
+        intent.putExtra("longitude", record.getLongitude());
+        intent.putExtra("latitude", record.getLatitude());
+        intent.putExtra("speed", record.getSpeed());
         startActivity(intent);
     }
 
