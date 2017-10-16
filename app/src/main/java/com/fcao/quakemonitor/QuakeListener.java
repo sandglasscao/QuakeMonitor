@@ -25,7 +25,6 @@ import java.util.List;
 public class QuakeListener implements SensorEventListener {
     private static final int maxLength = 2; //for overtop records to save into SQLite
     private static final DecimalFormat df2 = new DecimalFormat("#.00");
-    private static int mInterval_time;
     private float[] mthreshold;
     private int recordsSize_max;
     private SensorManager mSensorManager;
@@ -38,25 +37,13 @@ public class QuakeListener implements SensorEventListener {
     private final float[] mRotationMatrix = new float[9];
     private final float[] mOrientationAngles = new float[3];
 
-    private Context mContext;
-    private List<Record> mRecords, mOverTopRecords;
-    private MyDatabaseHelper mDatabaseHelper;
-    private LocationClient mLocationClient;
+    private QuakeActivity mParent;
     private double[] lastP = {0, 0, 0, 0};
     private long lastTime;
-    private TextView mLocmsg;
 
-    public QuakeListener(Context context, List<Record> records, List<Record> overTopRecords,
-                         int intervalTime, float[] threshold, MyDatabaseHelper mMysql,
-                         LocationClient locationClient, TextView locmsg) {
-        mContext = context;
-        mRecords = records;
-        mOverTopRecords = overTopRecords;
-        mDatabaseHelper = mMysql;
-        mLocationClient = locationClient;
-        mLocmsg = locmsg;
-        mInterval_time = intervalTime;
-        recordsSize_max = 2 * 1000 / mInterval_time;
+    public QuakeListener(QuakeActivity activity, float[] threshold) {
+        mParent = activity;
+        recordsSize_max = 2 * 1000 / mParent.intervalTime;
         setThreshold(threshold);
     }
 
@@ -88,12 +75,12 @@ public class QuakeListener implements SensorEventListener {
 
     public void setThreshold(float[] threshold) {
         mthreshold = threshold;
-        mRecords.clear();
+        mParent.mRecords.clear();
     }
 
     // start monitor the sensor accelerometer
     public void start() {
-        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) mParent.getSystemService(Context.SENSOR_SERVICE);
         if (null != mSensorManager) {
             aSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -104,12 +91,12 @@ public class QuakeListener implements SensorEventListener {
             mSensorManager.registerListener(this, mSensor,
                     SensorManager.SENSOR_DELAY_GAME, SensorManager.SENSOR_DELAY_UI);
         }
-        mLocationClient.start();
+        mParent.mLocClient.start();
     }
 
     // stop monitor the sensor accelerometer
     public void stop() {
-        mLocationClient.stop();
+        mParent.mLocClient.stop();
         mSensorManager.unregisterListener(this);
     }
 
@@ -133,7 +120,7 @@ public class QuakeListener implements SensorEventListener {
         x = x * 2;
         z = z * 2;
 
-        if ((curTime - lastTime) > mInterval_time) {
+        if ((curTime - lastTime) > mParent.intervalTime) {
             //long diffTime = curTime - lastTime;
             lastTime = curTime;
 
@@ -158,11 +145,11 @@ public class QuakeListener implements SensorEventListener {
 
     private void flush() {
         boolean isLocked = false;
-        SQLiteDatabase mDataBase = mDatabaseHelper.getReadableDatabase();
+        SQLiteDatabase mDataBase = mParent.mDBHelper.getReadableDatabase();
         mDataBase.beginTransaction();
         try {
             ContentValues values = new ContentValues();
-            for (Record record : mOverTopRecords) {
+            for (Record record : mParent.mOverTopRecords) {
                 values.put("x", record.getX());
                 values.put("y", record.getY());
                 values.put("z", record.getZ());
@@ -176,7 +163,7 @@ public class QuakeListener implements SensorEventListener {
             }
             // 设置事务标志为成功，当结束事务时就会提交事务
             mDataBase.setTransactionSuccessful();
-            mOverTopRecords.clear();
+            mParent.mOverTopRecords.clear();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -188,26 +175,28 @@ public class QuakeListener implements SensorEventListener {
 
     //save records
     private void saveRecords(Record record) {
-        if (maxLength <= mOverTopRecords.size())
+        if (maxLength <= mParent.mOverTopRecords.size())
             flush();
         saveLocation(record);
-        mOverTopRecords.add(record);
+        mParent.mOverTopRecords.add(record);
     }
 
     // get current longitude and latitude
     private void saveLocation(Record record) {
         try {
             //mLocationClient.requestLocation();
-            BDLocation location = mLocationClient.getLastKnownLocation();
+            BDLocation location = mParent.mLocClient.getLastKnownLocation();
             record.setLongitude(location.getLongitude());
             record.setLatitude(location.getLatitude());
             //record.setSpeed(location.getSpeed());
-            //updateLocMsg(location);
             float speed = Float.valueOf(df2.format(location.getSpeed()));
             record.setSpeed(speed);
-            String msg = "经度: " + location.getLongitude() + "   纬度: " + location.getLatitude()
-                    + "   速度: " + speed + " km/h";
-            mLocmsg.setText(msg);
+            //mParent.mAddrEv.setText("(" + location.getLongitude() + "," + location.getLatitude() + ")");
+            mParent.mAddrEv.setText(location.getAddrStr());
+            mParent.mSpeedEv.setText(String.valueOf(speed));
+            mParent.mCurrLong = location.getLongitude();
+            mParent.mCurrLatd = location.getLatitude();
+            mParent.mCurrSpeed = speed;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -225,9 +214,9 @@ public class QuakeListener implements SensorEventListener {
 
     //update sensor records
     private void updateRecords(Record record) {
-        if (recordsSize_max <= mRecords.size()) {
-            mRecords.remove(0);
+        if (recordsSize_max <= mParent.mRecords.size()) {
+            mParent.mRecords.remove(0);
         }
-        mRecords.add(record);
+        mParent.mRecords.add(record);
     }
 }

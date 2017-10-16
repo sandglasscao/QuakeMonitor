@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -68,6 +69,9 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public LocationClient mLocClient;
     public MyLocationListener mLocationListener;
     public MyDatabaseHelper mDBHelper;
+    public TextView mAddrEv, mSpeedEv;
+    public double mCurrLong, mCurrLatd;
+    public float mCurrSpeed;
 
     private boolean isAllGranted = false;
     private boolean isRunning, isOnPlatform;
@@ -76,7 +80,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     private Switch mStart, mOntrack;
     private RelativeLayout mRelativeLayout_tot, mRelativeLayout_x, mRelativeLayout_z;
     private Fragment mCurrentFragment;
-    private TextView mLocMsg;
+    private ImageView mHomeLoc;
 
     @Override
     public void onBackPressed() {
@@ -91,13 +95,11 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
                 onBackPressed();
                 break;
             }
-            case R.id.loc_msg: {
-                String msg = mLocMsg.getText().toString();
-                String[] msgLst = msg.split(" ");
+            case R.id.home_loc: {
                 Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
-                intent.putExtra("longitude", Double.valueOf(msgLst[1]));
-                intent.putExtra("latitude", Double.valueOf(msgLst[5]));
-                intent.putExtra("speed", Float.valueOf(msgLst[9]));
+                intent.putExtra("longitude", mCurrLong);
+                intent.putExtra("latitude", mCurrLatd);
+                intent.putExtra("speed", mCurrSpeed);
                 startActivity(intent);
                 break;
             }
@@ -279,10 +281,11 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
 
-        mLocMsg = findViewById(R.id.loc_msg);
-        mLocMsg.setOnClickListener(this);
-        mListener = new QuakeListener(this, mRecords, mOverTopRecords, intervalTime,
-                threshold, mDBHelper, mLocClient, mLocMsg);
+        mHomeLoc = findViewById(R.id.home_loc);
+        mHomeLoc.setOnClickListener(this);
+        mAddrEv = findViewById(R.id.addr);
+        mSpeedEv = findViewById(R.id.speed);
+        mListener = new QuakeListener(this, threshold);
         initSurfaceView();
 
         initGRAPH_POSITION();
@@ -381,7 +384,9 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         StorageList list = new StorageList(this);
         /*return (2 == list.getVolumePaths().length) ? list.getVolumePaths()[1]
                 : list.getVolumePaths()[0];*/
-        return list.getVolumePaths()[list.getVolumePaths().length - 1];
+        String path = (0 == list.getVolumePaths().length) ? Environment.getExternalStorageDirectory().getPath() :
+                list.getVolumePaths()[list.getVolumePaths().length - 1];
+        return path;
     }
 
     private String getMyDatabaseName() {
@@ -446,6 +451,9 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
         option.setCoorType("bd09ll");
         //可选，默认gcj02，设置返回的定位结果坐标系
+
+        option.setIsNeedAddress(true);
+        //可选，设置是否需要地址信息，默认不需要
 
         option.setOpenGps(true);
         //可选，默认false,设置是否使用gps
