@@ -17,12 +17,11 @@ import java.util.List;
  */
 
 public class QuakeAdapter extends BaseAdapter {
+    private static final DecimalFormat df2 = new DecimalFormat("#.00");
+    private static final DecimalFormat df6 = new DecimalFormat("#.000000");
+    private static final SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd HH:mm:ss");
     private LayoutInflater mInflater;
-    //private int layout;
     private List<Record> mRecords;
-    DecimalFormat df2 = new DecimalFormat("#.00");
-    DecimalFormat df6 = new DecimalFormat("#.000000");
-    SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
     public QuakeAdapter(Context context, List<Record> records) {
         mInflater = LayoutInflater.from(context);

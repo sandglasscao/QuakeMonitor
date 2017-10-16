@@ -9,11 +9,13 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -22,6 +24,7 @@ import java.util.List;
 
 public class QuakeListener implements SensorEventListener {
     private static final int maxLength = 2; //for overtop records to save into SQLite
+    private static final DecimalFormat df2 = new DecimalFormat("#.00");
     private static int mInterval_time;
     private float[] mthreshold;
     private int recordsSize_max;
@@ -198,17 +201,16 @@ public class QuakeListener implements SensorEventListener {
             BDLocation location = mLocationClient.getLastKnownLocation();
             record.setLongitude(location.getLongitude());
             record.setLatitude(location.getLatitude());
-            record.setSpeed(location.getSpeed());
-            updateLocMsg(location);
+            //record.setSpeed(location.getSpeed());
+            //updateLocMsg(location);
+            float speed = Float.valueOf(df2.format(location.getSpeed()));
+            record.setSpeed(speed);
+            String msg = "经度: " + location.getLongitude() + "   纬度: " + location.getLatitude()
+                    + "   速度: " + speed + " km/h";
+            mLocmsg.setText(msg);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void updateLocMsg(BDLocation location) {
-        String msg = "经度: " + location.getLongitude() + "   纬度: " + location.getLatitude()
-                + "   速度: " + location.getSpeed() + " km/h";
-        mLocmsg.setText(msg);
     }
 
     private void updateOrientationAngles() {

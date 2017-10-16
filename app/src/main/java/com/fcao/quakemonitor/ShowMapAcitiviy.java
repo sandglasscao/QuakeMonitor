@@ -14,13 +14,15 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
+import java.text.DecimalFormat;
+
 /**
  * Created by Frank on 10/7/2017.
  */
 
 public class ShowMapAcitiviy extends Activity {
     private static final double[] DEFAULT_LOCATION = {116.327779, 39.900769}; //北京
-    private static final float DEFAULT_SCALE = 12.5f; //default scale of map
+    private static final float DEFAULT_SCALE = 13f; //default scale of map
     private MapView mMapView;
     private BaiduMap mBaiduMap;
 

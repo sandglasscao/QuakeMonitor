@@ -38,7 +38,7 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         View view = inflater.inflate(R.layout.history, container, false);
 
         mListView = view.findViewById(R.id.show_list);
@@ -73,7 +73,7 @@ public class HistoryFragment extends Fragment implements OnItemClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     private void initRecords() {

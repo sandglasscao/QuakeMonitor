@@ -385,17 +385,13 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     }
 
     private String getMyDatabaseName() {
-        boolean isSdcardEnable = false;
-        String state = Environment.getExternalStorageState();
-        isSdcardEnable = Environment.MEDIA_MOUNTED.equals(state); //SDCard是否插入
-        String dbPath = null;
-        if (isSdcardEnable && isAllGranted) { //here isAllGranted must be true
-            //dbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + getPackageName();
-            dbPath = getExternalStoragePath() + "/Android/data/" + getPackageName();
-        } else {//未插入SDCard，建在内部存储卡中
+        if (!isAllGranted)
             finish();
-        }
-        dbPath = dbPath + "/database/";
+
+        String state = Environment.getExternalStorageState();
+        boolean isSdcardEnable = Environment.MEDIA_MOUNTED.equals(state); //SDCard是否插入
+        String dbPath = isSdcardEnable ? getExternalStoragePath() : getFilesDir().getPath();
+        dbPath = dbPath + "/Android/data/" + getPackageName() + "/database/";
         File dbp = new File(dbPath);
         if (!dbp.exists())
             dbp.mkdirs();
@@ -405,15 +401,12 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     }
 
     private String getStoragePath() {
-        boolean isSdcardEnable;
-        String filePath = getExternalStoragePath();
-        String state = Environment.getExternalStorageState();
-        isSdcardEnable = Environment.MEDIA_MOUNTED.equals(state); //SDCard是否插入
-        if (isSdcardEnable && isAllGranted) { //here isAllGranted must be true
-            filePath = filePath + "/Android/data";
-        } else {//未插入SDCard，建在内部存储卡中
+        if (!isAllGranted)
             finish();
-        }
+        String state = Environment.getExternalStorageState();
+        boolean isSdcardEnable = Environment.MEDIA_MOUNTED.equals(state); //SDCard是否插入
+        String filePath = isSdcardEnable ? getExternalStoragePath() : getFilesDir().getPath();
+        filePath = filePath + "/Android/data";
         File dbp = new File(filePath);
         if (!dbp.exists())
             dbp.mkdirs();
