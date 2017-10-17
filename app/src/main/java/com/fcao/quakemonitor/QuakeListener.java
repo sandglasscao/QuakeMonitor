@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
+import com.baidu.mapapi.utils.DistanceUtil;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -40,6 +41,7 @@ public class QuakeListener implements SensorEventListener {
     private QuakeActivity mParent;
     private double[] lastP = {0, 0, 0, 0};
     private long lastTime;
+    private float mLastSpeed;
 
     public QuakeListener(QuakeActivity activity, float[] threshold) {
         mParent = activity;
@@ -190,13 +192,19 @@ public class QuakeListener implements SensorEventListener {
             record.setLatitude(location.getLatitude());
             //record.setSpeed(location.getSpeed());
             float speed = Float.valueOf(df2.format(location.getSpeed()));
+            speed = (0 == speed && Math.abs(speed - mLastSpeed) > 10) ? mLastSpeed : speed;
+            // if current speed is zero and the difference between current speed and the last speed
+            // retried from BaiduLocation is large, then it means that the current speed is wrong
+            // and the vehicle should be inside a building or channel
+            //DistanceUtil.getDistance();
             record.setSpeed(speed);
-            //mParent.mAddrEv.setText("(" + location.getLongitude() + "," + location.getLatitude() + ")");
+
             mParent.mAddrEv.setText(location.getAddrStr());
             mParent.mSpeedEv.setText(String.valueOf(speed));
             mParent.mCurrLong = location.getLongitude();
             mParent.mCurrLatd = location.getLatitude();
             mParent.mCurrSpeed = speed;
+            mLastSpeed = speed;
         } catch (Exception e) {
             e.printStackTrace();
         }

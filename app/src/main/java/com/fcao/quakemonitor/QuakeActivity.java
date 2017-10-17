@@ -85,6 +85,9 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        // back from settings fragment
+        if (mCurrentFragment instanceof SettingsFragment)
+            super.onBackPressed();
         mCurrentFragment = null;
     }
 
@@ -395,8 +398,12 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
         String state = Environment.getExternalStorageState();
         boolean isSdcardEnable = Environment.MEDIA_MOUNTED.equals(state); //SDCard是否插入
-        String dbPath = isSdcardEnable ? getExternalStoragePath() : getFilesDir().getPath();
+        //String dbPath = isSdcardEnable ? getExternalStoragePath() : getFilesDir().getPath();
+        String dbPath = (isAllGranted && isSdcardEnable) ?
+                Environment.getExternalStorageDirectory().getPath() :
+                getFilesDir().getPath();
         dbPath = dbPath + "/Android/data/" + getPackageName() + "/database/";
+
         File dbp = new File(dbPath);
         if (!dbp.exists())
             dbp.mkdirs();

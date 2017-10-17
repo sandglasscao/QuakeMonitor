@@ -38,7 +38,7 @@ public class ShowMapAcitiviy extends Activity {
         Intent intent = getIntent();
         double longitude = intent.getDoubleExtra("longitude",DEFAULT_LOCATION[0]);
         double latitude = intent.getDoubleExtra("latitude", DEFAULT_LOCATION[1]);
-        double speed = intent.getFloatExtra("speed", 0);
+        float speed = intent.getFloatExtra("speed", 0);
         //Record record = (Record) intent.getSerializableExtra("records");
 
         mTextView = findViewById(R.id.loc_tv);
