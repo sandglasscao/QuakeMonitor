@@ -24,7 +24,7 @@ import java.util.List;
  */
 
 public class QuakeListener implements SensorEventListener {
-    private static final int maxLength = 2; //for overtop records to save into SQLite
+    private static final int maxLength = 50; //for overtop records to save into SQLite
     private static final DecimalFormat df2 = new DecimalFormat("#.00");
     private float[] mthreshold;
     private int recordsSize_max;
@@ -146,7 +146,6 @@ public class QuakeListener implements SensorEventListener {
     }
 
     private void flush() {
-        boolean isLocked = false;
         SQLiteDatabase mDataBase = mParent.mDBHelper.getReadableDatabase();
         mDataBase.beginTransaction();
         try {
