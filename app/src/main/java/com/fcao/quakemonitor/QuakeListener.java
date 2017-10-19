@@ -98,6 +98,7 @@ public class QuakeListener implements SensorEventListener {
 
     // stop monitor the sensor accelerometer
     public void stop() {
+        flush();
         mParent.mLocClient.stop();
         mSensorManager.unregisterListener(this);
     }

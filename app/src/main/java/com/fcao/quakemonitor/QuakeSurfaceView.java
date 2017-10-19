@@ -16,27 +16,29 @@ import java.util.List;
  */
 
 public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
-    private static final int MARGIN = 50;
+    private static final int MARGIN = 60;
     private final String[] titleApl = {"综合强度：%f", "水平检测：%f", "高低检测：%f"};
+    private final String[] levels = {"一级", "二级", "三级"};
     private int scrWidth, scrHeight;
     private float coordinate_x, coordinate_y, scale_x, scale_y;
-    private int mInterval_time;
+    //private int mInterval_time;
     private float lnWidth;
     private float[] mthreshold;
     private int mSeq;
     private  int mYmarks;
     private double maxApl;
     private List<Record> mRecords;
+    private QuakeActivity mParent;
 
     private MyThread myThread;
     private Paint mPaint, axesPaint, dashPaint;
     private TextPaint textPaint, scalePaint;
 
-    public QuakeSurfaceView(Activity activity, int intervalTime, float[] threshold, List<Record> records, int seq) {
+    public QuakeSurfaceView(Activity activity, float[] threshold, int seq) {
         super(activity);
-        mRecords = records;
-        mInterval_time = intervalTime;
+        mParent = (QuakeActivity) activity;
         mSeq = seq;
+        mRecords = mParent.mRecords;
         setThreshold(threshold);
         getHolder().addCallback(this);
         initPaints();
@@ -51,7 +53,6 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         drawWave(canvas);
         drawAxes(canvas);
     }
-
     public void setThreshold(float[] threshold) {
         mthreshold = threshold;
     }
@@ -86,12 +87,22 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
             canvas.drawText(markStr, xPosMark, yPos + MARGIN, scalePaint);
             canvas.drawLine(xPosMark, yPos, xPosMark, yPos - 10, axesPaint);
         }
-
+/*
         for (int i = 1; i <= mYmarks; i++) { // y axis
             float yPosMark = yPos - i * scale_y * 5 + axesPaint.getStrokeWidth() / 2;
             canvas.drawText(String.valueOf(i * 5), 0, yPosMark, scalePaint);
             canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
+        }*/
+
+        for(int i=0; i<mthreshold.length; i++) {
+            float yPosMark = yPos - mthreshold[i] * scale_y + axesPaint.getStrokeWidth() / 2;
+            //canvas.drawText(String.valueOf(mthreshold[i]), 0, yPosMark, scalePaint);
+            canvas.drawText(levels[i], 0, yPosMark+scale_y*3, scalePaint);
+            canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
         }
+        // level 3
+        float yPosMark3 = yPos - mthreshold[1] * scale_y + axesPaint.getStrokeWidth() / 2;
+        canvas.drawText(levels[2], 0, yPosMark3-scale_y*2, scalePaint);
 
         canvas.drawLine(MARGIN, yPos, scrWidth, yPos, axesPaint); // x axis
         canvas.drawLine(MARGIN, yPos, MARGIN, MARGIN, axesPaint); // y axis
@@ -164,10 +175,10 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         scrHeight = height;
         coordinate_x = scrWidth;
         coordinate_y = scrHeight - MARGIN;
-        scale_x = coordinate_x / 2 * mInterval_time / 1000;
+        scale_x = coordinate_x / 2 * mParent.intervalTime / 1000;
         scale_y = coordinate_y / 100;
-        scale_y = scale_y * 5;//(1 == mSeq) ? scale_y * 5 : scale_y * 3; // scale the y axis
-        mYmarks = 3;//(1 == mSeq) ? 3 : 5;
+        scale_y = scale_y * 3;//(1 == mSeq) ? scale_y * 5 : scale_y * 3; // scale the y axis
+        mYmarks = 5;//(1 == mSeq) ? 3 : 5;
         lnWidth = scale_x / 2;
     }
 

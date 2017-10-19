@@ -12,8 +12,11 @@
     <string name="home_page">首页</string>
     <string name="platform_thrshld">站内强度阀值</string>
     <string name="track_thrshld">线路强度阀值</string>
-    <string name="level_1">一级：</string>
-    <string name="level_2">二级：</string>
+    <string name="level_1_lbl">一级：</string>
+    <string name="level_2_lbl">二级：</string>
+    <string name="level_green">一级</string>
+    <string name="level_yellow">二级</string>
+    <string name="level_red">三级</string>
     <string name="history_apl">综合强度</string>
     <string name="history_apl_x">水平检测</string>
     <string name="history_apl_z">高低检测</string>

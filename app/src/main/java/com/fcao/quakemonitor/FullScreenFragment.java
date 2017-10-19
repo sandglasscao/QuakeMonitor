@@ -37,7 +37,11 @@ public class FullScreenFragment extends Fragment implements OnClickListener{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         View view = inflater.inflate(R.layout.full_screen, container, false);
-        QuakeSurfaceView surfaceView = new QuakeSurfaceView(getActivity(), mParent.intervalTime, mParent.mThreshold, mParent.mRecords, mPos);
+        float thresholdlevel1, thresholdlevel2;
+        thresholdlevel1 = mParent.isOnPlatform ? mParent.mThreshold[0] : mParent.mThreshold[2];
+        thresholdlevel2 = mParent.isOnPlatform ? mParent.mThreshold[1] : mParent.mThreshold[3];
+        float[] threshold = {thresholdlevel1, thresholdlevel2};
+        QuakeSurfaceView surfaceView = new QuakeSurfaceView(getActivity(), threshold, mPos);
         RelativeLayout layout = view.findViewById(R.id.show_full_src);
         layout.addView(surfaceView);
         layout.setOnClickListener(this);

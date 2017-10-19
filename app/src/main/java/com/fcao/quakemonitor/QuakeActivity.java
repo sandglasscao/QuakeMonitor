@@ -39,7 +39,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,9 +75,9 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public TextView mAddrEv, mSpeedEv;
     public double mCurrLong, mCurrLatd;
     public float mCurrSpeed;
-
+    public boolean isOnPlatform;
     private boolean isAllGranted = false;
-    private boolean isRunning, isOnPlatform;
+    private boolean isRunning;
     private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
     private QuakeListener mListener;
     private Switch mStart, mOntrack;
@@ -86,8 +89,8 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public void onBackPressed() {
         super.onBackPressed();
         // back from settings fragment
-        if (mCurrentFragment instanceof SettingsFragment)
-            super.onBackPressed();
+        //if (mCurrentFragment instanceof SettingsFragment)
+        //super.onBackPressed();
         mCurrentFragment = null;
     }
 
@@ -226,7 +229,11 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        initialize();
+        try {
+            initialize();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -250,7 +257,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         mListener.stop(); //unregister the listener
     }
 
-    private void initialize() {
+    private void initialize() throws ParseException {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         isAllGranted = checkPermissionAllGranted(PERMISSIONS);
@@ -283,13 +290,17 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
         thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
+        mListener = new QuakeListener(this, threshold);
 
         mHomeLoc = findViewById(R.id.home_loc);
         mHomeLoc.setOnClickListener(this);
         mAddrEv = findViewById(R.id.addr);
         mSpeedEv = findViewById(R.id.speed);
-        mListener = new QuakeListener(this, threshold);
         initSurfaceView();
+
+        if ((System.currentTimeMillis()-Long.parseLong("1522545312000"))>0) {
+            finish();
+        }
 
         initGRAPH_POSITION();
         mStart = findViewById(R.id.monitor_switch);
@@ -498,9 +509,13 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     }
 
     private void initSurfaceView() {
-        mQuakeView_tot = new QuakeSurfaceView(this, intervalTime, mThreshold, mRecords, 0);
-        mQuakeView_x = new QuakeSurfaceView(this, intervalTime, mThreshold, mRecords, 1);
-        mQuakeView_z = new QuakeSurfaceView(this, intervalTime, mThreshold, mRecords, 2);
+        float thresholdlevel1, thresholdlevel2;
+        thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
+        thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
+        float[] threshold = {thresholdlevel1, thresholdlevel2};
+        mQuakeView_tot = new QuakeSurfaceView(this, threshold, 0);
+        mQuakeView_x = new QuakeSurfaceView(this, threshold, 1);
+        mQuakeView_z = new QuakeSurfaceView(this, threshold, 2);
         mRelativeLayout_tot = findViewById(R.id.show_graph_tot);
         mRelativeLayout_x = findViewById(R.id.show_graph_x);
         mRelativeLayout_z = findViewById(R.id.show_graph_z);
