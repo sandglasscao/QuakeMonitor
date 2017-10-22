@@ -202,7 +202,7 @@ public class QuakeListener implements SensorEventListener {
                 hasBeginning = true;
             } else if (mParent.isOnPlatform) {
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                if (mParent.MAX_DISTANCE > DistanceUtil.getDistance(latLng, mBeginning)) {
+                if (mParent.MAX_DISTANCE <= DistanceUtil.getDistance(latLng, mBeginning)) {
                     mParent.mOntrack.setChecked(false);
                 }
             }

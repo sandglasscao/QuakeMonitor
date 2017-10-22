@@ -103,11 +103,13 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
                 break;
             }
             case R.id.home_loc: {
-                Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
-                intent.putExtra("longitude", mCurrLong);
-                intent.putExtra("latitude", mCurrLatd);
-                intent.putExtra("speed", mCurrSpeed);
-                startActivity(intent);
+                if (isRunning) {
+                    Intent intent = new Intent("com.fcao.quakemonitor.SHOW_MAP");
+                    intent.putExtra("longitude", mCurrLong);
+                    intent.putExtra("latitude", mCurrLatd);
+                    intent.putExtra("speed", mCurrSpeed);
+                    startActivity(intent);
+                }
                 break;
             }
             default: { // full screen to zoom out one of the three waveforms
@@ -239,10 +241,13 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
     @Override
     protected void onDestroy() {
+        isRunning = false;
+        mLocClient.unRegisterLocationListener(mLocationListener);
+        mListener.stop(); //unregister the listener
         mDBHelper.close();
         super.onDestroy();
     }
-
+/*
     @Override
     protected void onStart() {
         super.onStart();
@@ -258,7 +263,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         isRunning = false;
         mLocClient.unRegisterLocationListener(mLocationListener);
         mListener.stop(); //unregister the listener
-    }
+    }*/
 
     private void initialize() throws ParseException {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -306,6 +311,10 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
         initGRAPH_POSITION();
         initSwitch();
+        if (isRunning) {
+            mLocClient.registerLocationListener(mLocationListener);
+            mListener.start();
+        }
     }
 
     private boolean checkAuth() {

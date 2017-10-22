@@ -48,6 +48,7 @@
 
         <activity
             android:name=".QuakeActivity"
+            android:launchMode="singleTask"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
