@@ -34,21 +34,22 @@ import android.widget.Toast;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.model.LatLng;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class QuakeActivity extends Activity implements View.OnClickListener {
+    // over 200m, the default distance from the beginning means that trains are outside of the station
+    public static final int MAX_DISTANCE = 200;
     public static final int REQUEST_PERMISSION_CODE = 1;
     private static final Map GRAPH_POSITION = new HashMap();
     private static String DB_NAME = "Quake.db";
@@ -76,11 +77,12 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public double mCurrLong, mCurrLatd;
     public float mCurrSpeed;
     public boolean isOnPlatform;
+    public Switch mOntrack;
     private boolean isAllGranted = false;
     private boolean isRunning;
     private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
     private QuakeListener mListener;
-    private Switch mStart, mOntrack;
+    private Switch mStart;
     private RelativeLayout mRelativeLayout_tot, mRelativeLayout_x, mRelativeLayout_z;
     private Fragment mCurrentFragment;
     private ImageView mHomeLoc;

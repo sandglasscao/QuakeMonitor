@@ -25,7 +25,7 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     private float lnWidth;
     private float[] mthreshold;
     private int mSeq;
-    private  int mYmarks;
+    private int mYmarks;
     private double maxApl;
     private List<Record> mRecords;
     private QuakeActivity mParent;
@@ -53,6 +53,7 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         drawWave(canvas);
         drawAxes(canvas);
     }
+
     public void setThreshold(float[] threshold) {
         mthreshold = threshold;
     }
@@ -87,22 +88,24 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
             canvas.drawText(markStr, xPosMark, yPos + MARGIN, scalePaint);
             canvas.drawLine(xPosMark, yPos, xPosMark, yPos - 10, axesPaint);
         }
-/*
-        for (int i = 1; i <= mYmarks; i++) { // y axis
-            float yPosMark = yPos - i * scale_y * 5 + axesPaint.getStrokeWidth() / 2;
-            canvas.drawText(String.valueOf(i * 5), 0, yPosMark, scalePaint);
-            canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
-        }*/
+        if (mSeq > 0) {
 
-        for(int i=0; i<mthreshold.length; i++) {
-            float yPosMark = yPos - mthreshold[i] * scale_y + axesPaint.getStrokeWidth() / 2;
-            //canvas.drawText(String.valueOf(mthreshold[i]), 0, yPosMark, scalePaint);
-            canvas.drawText(levels[i], 0, yPosMark+scale_y*3, scalePaint);
-            canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
+            for (int i = 1; i <= mYmarks; i++) { // y axis
+                float yPosMark = yPos - i * scale_y * 5 + axesPaint.getStrokeWidth() / 2;
+                canvas.drawText(String.valueOf(i * 5), 0, yPosMark, scalePaint);
+                canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
+            }
+        } else {
+            for (int i = 0; i < mthreshold.length; i++) {
+                float yPosMark = yPos - mthreshold[i] * scale_y + axesPaint.getStrokeWidth() / 2;
+                //canvas.drawText(String.valueOf(mthreshold[i]), 0, yPosMark, scalePaint);
+                canvas.drawText(levels[i], 0, yPosMark + scale_y * 3, scalePaint);
+                canvas.drawLine(MARGIN, yPosMark, coordinate_x, yPosMark, dashPaint);
+            }
+            // level 3
+            float yPosMark3 = yPos - mthreshold[1] * scale_y + axesPaint.getStrokeWidth() / 2;
+            canvas.drawText(levels[2], 0, yPosMark3 - scale_y * 2, scalePaint);
         }
-        // level 3
-        float yPosMark3 = yPos - mthreshold[1] * scale_y + axesPaint.getStrokeWidth() / 2;
-        canvas.drawText(levels[2], 0, yPosMark3-scale_y*2, scalePaint);
 
         canvas.drawLine(MARGIN, yPos, scrWidth, yPos, axesPaint); // x axis
         canvas.drawLine(MARGIN, yPos, MARGIN, MARGIN, axesPaint); // y axis

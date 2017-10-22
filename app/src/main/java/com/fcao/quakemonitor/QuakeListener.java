@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
+import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 
 import java.text.DecimalFormat;
@@ -42,6 +43,8 @@ public class QuakeListener implements SensorEventListener {
     private double[] lastP = {0, 0, 0, 0};
     private long lastTime;
     private float mLastSpeed;
+    private LatLng mBeginning = null;
+    private boolean hasBeginning = false;
 
     public QuakeListener(QuakeActivity activity, float[] threshold) {
         mParent = activity;
@@ -198,6 +201,18 @@ public class QuakeListener implements SensorEventListener {
             // and the vehicle should be inside a building or channel
             //DistanceUtil.getDistance();
             record.setSpeed(speed);
+
+            if(!hasBeginning) {
+                mBeginning = new LatLng(location.getLatitude(), location.getLongitude());
+                hasBeginning = true;
+            } else {
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                double dis = DistanceUtil.getDistance(latLng, mBeginning);
+                if (mParent.MAX_DISTANCE< dis) {
+                    //mParent.isOnPlatform = false;
+                    mParent.mOntrack.setChecked(true);
+                }
+            }
 
             mParent.mAddrEv.setText(location.getAddrStr());
             mParent.mSpeedEv.setText(String.valueOf(speed));
