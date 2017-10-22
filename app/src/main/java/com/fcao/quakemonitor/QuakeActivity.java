@@ -49,7 +49,7 @@ import java.util.Map;
 
 public class QuakeActivity extends Activity implements View.OnClickListener {
     // over 200m, the default distance from the beginning means that trains are outside of the station
-    public static final int MAX_DISTANCE = 200;
+    public static final int MAX_DISTANCE = 20;
     public static final int REQUEST_PERMISSION_CODE = 1;
     private static final Map GRAPH_POSITION = new HashMap();
     private static String DB_NAME = "Quake.db";
@@ -69,7 +69,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     //3: threshold level 2 of on track, default 10
     public List<Record> mRecords = new ArrayList<>();
     public List<Record> mOverTopRecords = new ArrayList<>();
-    public int intervalTime; // default interval time for listener
+    public int intervalTime = 20; // default interval time for listener
     public LocationClient mLocClient;
     public MyLocationListener mLocationListener;
     public MyDatabaseHelper mDBHelper;
@@ -78,8 +78,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public float mCurrSpeed;
     public boolean isOnPlatform;
     public Switch mOntrack;
-    private boolean isAllGranted = false;
-    private boolean isRunning;
+    private boolean isAllGranted = false, isRunning = false;
     private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
     private QuakeListener mListener;
     private Switch mStart;
@@ -247,14 +246,16 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onStart() {
         super.onStart();
-        if (isRunning)
+        if (isRunning) {
             mLocClient.registerLocationListener(mLocationListener);
-        mListener.start();
+            mListener.start();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        isRunning = false;
         mLocClient.unRegisterLocationListener(mLocationListener);
         mListener.stop(); //unregister the listener
     }
@@ -287,7 +288,6 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
         // 定位初始化
         initLocClient();
-        intervalTime = 20; //default interval time 20ms
         float thresholdlevel1, thresholdlevel2;
         thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
         thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
@@ -300,37 +300,12 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         mSpeedEv = findViewById(R.id.speed);
         initSurfaceView();
 
-        if ((System.currentTimeMillis()-Long.parseLong("1522545312000"))>0) {
+        if ((System.currentTimeMillis() - Long.parseLong("1522545312000")) > 0) {
             finish();
         }
 
         initGRAPH_POSITION();
-        mStart = findViewById(R.id.monitor_switch);
-        mStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if (isChecked)
-                    mListener.start();
-                else
-                    mListener.stop();
-                isRunning = isChecked;
-            }
-        });
-        isRunning = mStart.isChecked();
-
-        mOntrack = findViewById(R.id.platform_switch);
-        mOntrack.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if (isRunning) {
-                    mListener.stop();
-                    mListener.start();
-                }
-                isOnPlatform = isChecked;
-                resetThreshold();
-            }
-        });
-        isOnPlatform = mOntrack.isChecked();
+        initSwitch();
     }
 
     private boolean checkAuth() {
@@ -527,6 +502,35 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         mRelativeLayout_tot.setOnClickListener(this);
         mRelativeLayout_x.setOnClickListener(this);
         mRelativeLayout_z.setOnClickListener(this);
+    }
+
+    private void initSwitch() {
+        mStart = findViewById(R.id.monitor_switch);
+        mStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                isRunning = isChecked;
+                if (isRunning)
+                    mListener.start();
+                else
+                    mListener.stop();
+            }
+        });
+        isRunning = mStart.isChecked();
+
+        mOntrack = findViewById(R.id.platform_switch);
+        mOntrack.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                isOnPlatform = isChecked;
+                if (isRunning) {
+                    mListener.stop();
+                    mListener.start();
+                }
+                resetThreshold();
+            }
+        });
+        isOnPlatform = mOntrack.isChecked();
     }
 
     // open the detail of permission settings

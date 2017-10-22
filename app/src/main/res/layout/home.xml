@@ -32,8 +32,7 @@
             android:id="@+id/monitor_lbl"
             android:layout_width="64dp"
             android:layout_height="21dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:text="@string/on_off"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -44,39 +43,33 @@
             android:id="@+id/monitor_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:checked="true"
-            android:textOff="OFF"
-            android:textOn="ON"
+            android:checked="false"
             app:layout_constraintBottom_toBottomOf="@+id/monitor_lbl"
             app:layout_constraintLeft_toRightOf="@+id/monitor_lbl"
             app:layout_constraintTop_toTopOf="@+id/monitor_lbl"
-            tools:checked="true"/>
+            tools:checked="false"/>
 
         <TextView
             android:id="@+id/platform_lbl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:text="@string/platform"
+            android:layout_marginLeft="40dp"
+            android:text="@string/track_station"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/monitor_lbl"
-            app:layout_constraintRight_toLeftOf="@+id/platform_switch"
+            app:layout_constraintLeft_toRightOf="@+id/monitor_switch"
             app:layout_constraintTop_toTopOf="@+id/monitor_lbl"
-            app:layout_constraintVertical_bias="0.0"/>
+            app:layout_constraintVertical_bias="1.0"/>
 
         <Switch
             android:id="@+id/platform_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
+            android:layout_marginLeft="8dp"
             android:checked="true"
-            android:textOff="OFF"
-            android:textOn="ON"
             app:layout_constraintBottom_toBottomOf="@+id/platform_lbl"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/platform_lbl"
             app:layout_constraintTop_toTopOf="@+id/platform_lbl"
             tools:checked="true"/>
 

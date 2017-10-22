@@ -21,7 +21,6 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     private final String[] levels = {"一级", "二级", "三级"};
     private int scrWidth, scrHeight;
     private float coordinate_x, coordinate_y, scale_x, scale_y;
-    //private int mInterval_time;
     private float lnWidth;
     private float[] mthreshold;
     private int mSeq;
@@ -155,21 +154,8 @@ public class QuakeSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     private double getApl(int pos) {
         double Apl = 0;
-        switch (mSeq) {
-            case 0: {
-                Apl = mRecords.get(pos).getDistance();
-                break;
-            }
-            case 1: {
-                Apl = mRecords.get(pos).getX();
-                break;
-            }
-            case 2: {
-                Apl = mRecords.get(pos).getZ();
-                break;
-            }
-            default:
-        }
+        Apl = (0 == mSeq) ? mRecords.get(pos).getDistance() :
+                (1 == mSeq) ? mRecords.get(pos).getX() : mRecords.get(pos).getZ();
         return Apl;
     }
 
