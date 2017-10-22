@@ -202,16 +202,13 @@ public class QuakeListener implements SensorEventListener {
             //DistanceUtil.getDistance();
             record.setSpeed(speed);
 
-            if(!hasBeginning) {
+            if (!hasBeginning) {
                 mBeginning = new LatLng(location.getLatitude(), location.getLongitude());
                 hasBeginning = true;
-            } else {
+            } else if (mParent.isOnPlatform) {
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 double dis = DistanceUtil.getDistance(latLng, mBeginning);
-                if (mParent.MAX_DISTANCE< dis) {
-                    //mParent.isOnPlatform = false;
-                    mParent.mOntrack.setChecked(true);
-                }
+                mParent.mOntrack.setChecked((mParent.MAX_DISTANCE < dis));
             }
 
             mParent.mAddrEv.setText(location.getAddrStr());
