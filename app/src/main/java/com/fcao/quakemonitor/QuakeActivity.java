@@ -34,7 +34,6 @@ import android.widget.Toast;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
-import com.baidu.mapapi.model.LatLng;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,7 +48,7 @@ import java.util.Map;
 
 public class QuakeActivity extends Activity implements View.OnClickListener {
     // over 200m, the default distance from the beginning means that trains are outside of the station
-    public static final int MAX_DISTANCE = 20;
+    public static final int MAX_DISTANCE = 200;
     public static final int REQUEST_PERMISSION_CODE = 1;
     private static final Map GRAPH_POSITION = new HashMap();
     private static String DB_NAME = "Quake.db";
@@ -76,7 +75,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public TextView mAddrEv, mSpeedEv;
     public double mCurrLong, mCurrLatd;
     public float mCurrSpeed;
-    public boolean isOnPlatform;
+    public boolean isOnTrack;
     public Switch mOntrack;
     private boolean isAllGranted = false, isRunning = false;
     private QuakeSurfaceView mQuakeView_tot, mQuakeView_x, mQuakeView_z;
@@ -294,8 +293,8 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         // 定位初始化
         initLocClient();
         float thresholdlevel1, thresholdlevel2;
-        thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
-        thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
+        thresholdlevel1 = isOnTrack ? mThreshold[2] : mThreshold[0];
+        thresholdlevel2 = isOnTrack ? mThreshold[3] : mThreshold[1];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
         mListener = new QuakeListener(this, threshold);
 
@@ -496,8 +495,8 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
     private void initSurfaceView() {
         float thresholdlevel1, thresholdlevel2;
-        thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
-        thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
+        thresholdlevel1 = isOnTrack ? mThreshold[2] : mThreshold[0];
+        thresholdlevel2 = isOnTrack ? mThreshold[3] : mThreshold[1];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
         mQuakeView_tot = new QuakeSurfaceView(this, threshold, 0);
         mQuakeView_x = new QuakeSurfaceView(this, threshold, 1);
@@ -531,7 +530,9 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         mOntrack.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                isOnPlatform = isChecked;
+                isOnTrack = isChecked;
+                if(!isOnTrack)
+                    mListener.resetHasBeginning();
                 if (isRunning) {
                     mListener.stop();
                     mListener.start();
@@ -539,7 +540,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
                 resetThreshold();
             }
         });
-        isOnPlatform = mOntrack.isChecked();
+        isOnTrack = mOntrack.isChecked();
     }
 
     // open the detail of permission settings
@@ -566,8 +567,8 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
 
     private void resetThreshold() {
         float thresholdlevel1, thresholdlevel2;
-        thresholdlevel1 = isOnPlatform ? mThreshold[0] : mThreshold[2];
-        thresholdlevel2 = isOnPlatform ? mThreshold[1] : mThreshold[3];
+        thresholdlevel1 = isOnTrack ? mThreshold[2] : mThreshold[0];
+        thresholdlevel2 = isOnTrack ? mThreshold[3] : mThreshold[1];
         float[] threshold = {thresholdlevel1, thresholdlevel2};
         mQuakeView_tot.setThreshold(threshold);
         mQuakeView_x.setThreshold(threshold);

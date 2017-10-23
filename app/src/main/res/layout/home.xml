@@ -55,8 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
-            android:text="@string/track_station"
-            android:visibility="visible"
+            android:text="@string/station_track"
             app:layout_constraintBottom_toBottomOf="@+id/monitor_lbl"
             app:layout_constraintLeft_toRightOf="@+id/monitor_switch"
             app:layout_constraintTop_toTopOf="@+id/monitor_lbl"
@@ -67,11 +66,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:checked="true"
+            android:checked="false"
             app:layout_constraintBottom_toBottomOf="@+id/platform_lbl"
             app:layout_constraintLeft_toRightOf="@+id/platform_lbl"
             app:layout_constraintTop_toTopOf="@+id/platform_lbl"
-            tools:checked="true"/>
+            />
 
         <TextView
             android:id="@+id/loc_msg"

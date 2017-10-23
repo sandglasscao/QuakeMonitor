@@ -4,7 +4,7 @@
     <string name="cancel">取消</string>
     <string name="clear">清空记录</string>
     <string name="on_off">结束/开始</string>
-    <string name="track_station">线路/站内</string>
+    <string name="station_track">站内/线路</string>
     <string name="menu_search">查找</string>
     <string name="menu_analysis">二次分析</string>
     <string name="menu_settings">设置</string>

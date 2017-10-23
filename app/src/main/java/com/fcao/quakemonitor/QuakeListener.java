@@ -104,7 +104,6 @@ public class QuakeListener implements SensorEventListener {
         flush();
         mParent.mLocClient.stop();
         mSensorManager.unregisterListener(this);
-        hasBeginning = false;
         mBeginning = null;
     }
 
@@ -182,6 +181,10 @@ public class QuakeListener implements SensorEventListener {
         mParent.mOverTopRecords.add(record);
     }
 
+    public void resetHasBeginning() {
+        hasBeginning = false;
+    }
+
     // get current longitude and latitude
     private void saveLocation(Record record) {
         try {
@@ -196,16 +199,18 @@ public class QuakeListener implements SensorEventListener {
             // retried from BaiduLocation is too large, then it means that the current speed is wrong
             // and the vehicle should be inside a building or channel
             record.setSpeed(speed);
-
+            double dist = 0;
             if (!hasBeginning) {
                 mBeginning = new LatLng(location.getLatitude(), location.getLongitude());
                 hasBeginning = true;
-            } else if (mParent.isOnPlatform) {
+            } else if (!mParent.isOnTrack) {
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                dist = DistanceUtil.getDistance(latLng, mBeginning);
                 if (mParent.MAX_DISTANCE <= DistanceUtil.getDistance(latLng, mBeginning)) {
-                    mParent.mOntrack.setChecked(false);
+                    mParent.mOntrack.setChecked(true);
                 }
             }
+
 
             mParent.mAddrEv.setText(location.getAddrStr());
             mParent.mSpeedEv.setText(String.valueOf(speed));
