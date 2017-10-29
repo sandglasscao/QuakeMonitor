@@ -2,23 +2,17 @@ package com.fcao.quakemonitor;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
-import android.widget.NumberPicker;
-import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
-import com.baidu.location.LocationClient;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 
 import java.text.DecimalFormat;
-import java.util.List;
 
 /**
  * Created by Frank on 7/12/2017.
@@ -135,6 +129,7 @@ public class QuakeListener implements SensorEventListener {
             updateRecords(record);
 
             if (dist >= mthreshold[1]) {
+                mParent.mPlayer.start();
                 saveRecords(record);
             }
 
@@ -183,6 +178,7 @@ public class QuakeListener implements SensorEventListener {
 
     public void resetHasBeginning() {
         hasBeginning = false;
+        mBeginning = null;
     }
 
     // get current longitude and latitude

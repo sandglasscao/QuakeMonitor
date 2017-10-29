@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -69,6 +70,7 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
     public List<Record> mRecords = new ArrayList<>();
     public List<Record> mOverTopRecords = new ArrayList<>();
     public int intervalTime = 20; // default interval time for listener
+    public MediaPlayer mPlayer;
     public LocationClient mLocClient;
     public MyLocationListener mLocationListener;
     public MyDatabaseHelper mDBHelper;
@@ -244,6 +246,10 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
         mLocClient.unRegisterLocationListener(mLocationListener);
         mListener.stop(); //unregister the listener
         mDBHelper.close();
+        if (mPlayer != null) {
+            mPlayer.stop();
+            mPlayer.release();
+        }
         super.onDestroy();
     }
 /*
@@ -314,6 +320,8 @@ public class QuakeActivity extends Activity implements View.OnClickListener {
             mLocClient.registerLocationListener(mLocationListener);
             mListener.start();
         }
+
+        mPlayer = MediaPlayer.create(this, R.raw.alarm);
     }
 
     private boolean checkAuth() {
